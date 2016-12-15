@@ -27,27 +27,18 @@ public:
     EQFG_Edge(const EQFG_Edge & e);
 };
 
-class EQFG_QNode
+class EQFG_Node
 {
 public:
     int id_;
     vector<EQFG_Edge> toQueryEdges_; // outedges
     //vector<EQFG_Edge> inQueryEdges_; // inedges
     vector<EQFG_Edge> toEntityEdges_;
-    EQFG_QNode(int id);
+    EQFG_Node(int id);
 };
 
 
-class EQFG_ENode
-{
-public:
-    int id_;
-    
-    vector<EQFG_Edge> toQueryEdges_;
-    vector<EQFG_Edge> toEntityEdges_;
-    //vector<EQFG_Edge> inEntityEdges_;
-    EQFG_ENode(int id);
-};
+
 
 class EQFG
 {
@@ -61,15 +52,14 @@ public:
 	//map<int, map<int, double>> doc2entityPro_;
 	//map<int, map<int, double>> doc2queryPro_;
 	
-    vector<EQFG_QNode> QNodes_;
-    vector<EQFG_ENode> ENodes_;
+    vector<EQFG_Node> QNodes_;
+    vector<EQFG_Node> ENodes_;
     
     vector<string> queries_;
     vector<string> entities_;
 	//vector<string> documents_;
     
     
-    EQFG(string queryFollowPath, string queryEntityPath, string queryCountPath);
 	EQFG(string indexPath);
  
     void saveToFiles(string dirPath);
