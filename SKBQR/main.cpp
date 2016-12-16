@@ -12,7 +12,7 @@ string qlPath, testPath, outPath;
 
 void loadInputPaths(string pathPath, char** argv)
 {
-	ifstream pathin = ifstream(pathPath.c_str(), ios::in);
+	ifstream pathin(pathPath.c_str(), ios::in);
 	string line;
 	getline(pathin, line);
 	if (line == "WIN") {
