@@ -36,7 +36,7 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 	for (map<int, double>::iterator i = initialInk.begin(); i != initialInk.end(); ++i) {
 		heap.push(*i);
 	}
-	while (heap.size() > 0 && activeInk > 0.0001) {
+	while (heap.size() > 0 && activeInk > 0.001) {
 		pair<int, double> topItem = heap.pop();
 		cerr << topItem.first << '\t' << topItem.second << endl;
 		double increaseInk = topItem.second * alpha;
