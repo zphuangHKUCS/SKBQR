@@ -57,6 +57,8 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 			// No spatial adjustment now
 			double tw = edges[i].w_;
 			double addInk = distributedInk * tw;
+			if (addInk < 0.00001)
+				continue;
 			heap.push(make_pair(edges[i].eid_, addInk));
 		}
 	}
