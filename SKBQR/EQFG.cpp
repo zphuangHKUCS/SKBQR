@@ -43,6 +43,7 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 			result[topItem.first] = 0.0;
 		}
 		result[topItem.first] += increaseInk;
+		activeInk -= increaseInk;
 		double distributedInk = (1.0 - alpha) * topItem.second;
 		vector<EQFG_Edge> & edges = nodes[topItem.first].toEntityEdges_;
 		if (edgeType == 1) {

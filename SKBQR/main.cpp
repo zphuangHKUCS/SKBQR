@@ -15,6 +15,7 @@ void loadInputPaths(string pathPath, char** argv)
 	ifstream pathin(pathPath.c_str(), ios::in);
 	string line;
 	getline(pathin, line);
+	cerr << line << endl;
 	if (line == "WIN") {
 		getline(pathin, qlPath);
 		getline(pathin, testPath);
@@ -34,7 +35,6 @@ void loadInputPaths(string pathPath, char** argv)
 
 int main(int argc, char** argv)
 {
-	
 	loadInputPaths("paths.txt", argv);
 	EQFG eqfg(qlPath);
 	eqfg.rec_QFG_fromfile(testPath, outPath);
