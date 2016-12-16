@@ -223,6 +223,28 @@ vector<pair<int, double> > EQFG::rec_QFG(int qid)
 	return PPR_BCA(QNodes_, ink, 0.3, 1.0, k_, 1);
 }
 
+vector<pair<int, double> > EQFG::rec_EQFG(int qid)
+{
+	map<int, double> eink;
+	for (int i = 0; i < QNodes_[qid].toEntityEdges_.size(); ++i) {
+		eink[QNodes_[qid].toEntityEdges_[i].eid_] = QNodes_[qid].toEntityEdges_[i].w_;
+	}
+	vector<pair<int, double>> eidWeights = PPR_BCA(ENodes_, eink, 0.3, 1.0, NUMOFRELATEDENTITY, 0);
+	map<int, double> qink;
+	for (int i = 0; i < eidWeights.size(); ++i) {
+		int eid = eidWeights[i].first;
+		double w_e = eidWeights[i].second;
+		for (int j = 0; j < ENodes_[eid].toQueryEdges_.size(); ++j) {
+			int id = ENodes_[eid].toQueryEdges_[j].eid_;
+			if (qink.find(id) == qink.end()) {
+				qink[id] = 0.0;
+			}
+			qink[id] += ENodes_[eid].toQueryEdges_[j].w_ * w_e;
+		}
+	}
+	return PPR_BCA(QNodes_, qink, 0.3, 1.0, k_, 1);
+}
+
 void EQFG::rec_QFG_fromfile(string inPath, string outPath)
 {
 	ifstream in(inPath.c_str(), ios::in);
@@ -233,6 +255,30 @@ void EQFG::rec_QFG_fromfile(string inPath, string outPath)
 		if (query2id_.find(line) != query2id_.end()) {
 			int qid = query2id_[line];
 			vector<pair<int, double> > ret = rec_QFG(qid);
+			out << line;
+			for (int i = 0; i < ret.size(); ++i) {
+				out << '\t' << queries_[ret[i].first] << '\t' << ret[i].second;
+			}
+			out << endl;
+		}
+		else {
+			out << line << endl;
+		}
+	}
+	in.close();
+	out.close();
+}
+
+void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
+{
+	ifstream in(inPath.c_str(), ios::in);
+	ofstream out(outPath.c_str(), ios::out);
+	string line;
+	while (getline(in, line)) {
+		//cerr << line << endl;
+		if (query2id_.find(line) != query2id_.end()) {
+			int qid = query2id_[line];
+			vector<pair<int, double> > ret = rec_EQFG(qid);
 			out << line;
 			for (int i = 0; i < ret.size(); ++i) {
 				out << '\t' << queries_[ret[i].first] << '\t' << ret[i].second;

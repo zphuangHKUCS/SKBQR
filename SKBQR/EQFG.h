@@ -18,6 +18,8 @@
 
 using namespace std;
 
+#define NUMOFRELATEDENTITY 20
+
 
 class EQFG_Edge
 {
@@ -43,10 +45,10 @@ public:
 
 class EQFG
 {
-private:
+public:
 	int k_;
-
 	vector<pair<int, double> > rec_QFG(int qid);
+	vector<pair<int, double> > rec_EQFG(int qid);
 
 public:
     
@@ -71,6 +73,9 @@ public:
     void saveToFiles(string dirPath);
 
 	void rec_QFG_fromfile(string inputPath, string outPath);
+	void rec_EQFG_fromfile(string inputPath, string outPath);
+
+
 };
 
 
