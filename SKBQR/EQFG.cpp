@@ -286,7 +286,7 @@ void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
 	ofstream out(outPath.c_str(), ios::out);
 	string line;
 	while (getline(in, line)) {
-		//cerr << line << endl;
+		cerr << line << endl;
 		if (query2id_.find(line) != query2id_.end()) {
 			int qid = query2id_[line];
 			vector<pair<int, double> > ret = rec_EQFG(qid);
