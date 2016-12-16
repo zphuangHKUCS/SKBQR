@@ -19,6 +19,7 @@
 using namespace std;
 
 #define NUMOFRELATEDENTITY 20
+#define GAMMA 0.5
 
 
 class EQFG_Edge

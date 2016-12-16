@@ -225,11 +225,14 @@ vector<pair<int, double> > EQFG::rec_QFG(int qid)
 
 vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 {
+	// The first PPR
 	map<int, double> eink;
 	for (int i = 0; i < QNodes_[qid].toEntityEdges_.size(); ++i) {
 		eink[QNodes_[qid].toEntityEdges_[i].sid_] = 1.0 / QNodes_[qid].toEntityEdges_.size();
 	}
 	vector<pair<int, double>> eidWeights = PPR_BCA(ENodes_, eink, 0.3, 1.0, NUMOFRELATEDENTITY, 0);
+	
+	// The second PPRs
 	map<int, double> qink;
 	for (int i = 0; i < eidWeights.size(); ++i) {
 		int eid = eidWeights[i].first;
@@ -239,9 +242,15 @@ vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 			if (qink.find(id) == qink.end()) {
 				qink[id] = 0.0;
 			}
-			qink[id] += ENodes_[eid].toQueryEdges_[j].w_ * w_e;
+			qink[id] += ENodes_[eid].toQueryEdges_[j].w_ * w_e * GAMMA;
 		}
 	}
+	// Combine QFG with EQFG
+	if (qink.find(qid) == qink.end()) {
+		qink[qid] = 0.0;
+	}
+	qink[qid] += 1.0 - GAMMA;
+
 	return PPR_BCA(QNodes_, qink, 0.3, 1.0, k_, 1);
 }
 
