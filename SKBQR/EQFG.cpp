@@ -39,6 +39,9 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 	while (heap.size() > 0 && activeInk > 0.001) {
 		pair<int, double> topItem = heap.pop();
 		cerr << activeInk << endl;
+		if (topItem.second < 0.00001) {
+			continue;
+		}
 		double increaseInk = topItem.second * alpha;
 		if (result.find(topItem.first) == result.end()) {
 			result[topItem.first] = 0.0;
