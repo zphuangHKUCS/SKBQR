@@ -6,15 +6,33 @@
 //  Copyright (c) 2016年 黄智鹏. All rights reserved.
 //
 
+
 #ifndef EQFG_Tools_h
 #define EQFG_Tools_h
 
 #include <vector>
 #include <cstring>
 #include <iostream>
+#include <sstream>
 using namespace std;
 
 
+void tempsplit(string &s, string delim, std::vector<string> &elems) {
+	stringstream ss;
+	ss.str(s);
+	std::string item;
+	while (getline(ss, item, delim[0])) {
+		elems.push_back(item);
+	}
+}
+
+vector<string> split(string &s, string delim = "\t") {
+	vector<std::string> elems;
+	tempsplit(s, delim, elems);
+	return elems;
+}
+
+/*
 vector<string> split(string str, string separator = "\t")
 {
     vector<string> result;
@@ -37,6 +55,7 @@ vector<string> split(string str, string separator = "\t")
     }
     return result;
 }
+*/
 
 vector<string> mysplit(string str, string separator = "\t")
 {

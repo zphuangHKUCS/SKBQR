@@ -14,6 +14,7 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include "BoundHeap.h"
 
 using namespace std;
 
@@ -42,6 +43,9 @@ public:
 
 class EQFG
 {
+private:
+	int k_;
+
 public:
     
     map<string, int> query2id_;
@@ -60,9 +64,11 @@ public:
 	//vector<string> documents_;
     
     
-	EQFG(string indexPath);
+	EQFG(string indexPath, int k = 5);
  
     void saveToFiles(string dirPath);
+
+	vector<pair<int, double> > rec_QFG(int qid);
 };
 
 

@@ -17,19 +17,65 @@
 
 #include "Tools.h"
 
+
 using namespace std;
 
-
-
-EQFG_Node::EQFG_Node(int id): id_(id)
-{
-
+double spatialAdjustWeight() {
+	return 0.0;
 }
 
-EQFG_Edge::EQFG_Edge(int id1, int id2, double w): sid_(id1), eid_(id2), w_(w)
+vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0)
 {
+	// edgeType = 0 for entity PPR
+	// edgeType = 1 for query PPR
+	BoundHeap heap(9999999);
+	double activeInk = 1.0;
+	map<int, double> result;
 
+	// initialize the heap
+	for (map<int, double>::iterator i = initialInk.begin(); i != initialInk.end(); ++i) {
+		heap.push(*i);
+	}
+	while (heap.size() > 0 && activeInk > 0.0001) {
+		pair<int, double> topItem = heap.pop();
+		double increaseInk = topItem.second * alpha;
+		if (result.find(topItem.first) == result.end()) {
+			result[topItem.first] = 0.0;
+		}
+		result[topItem.first] += increaseInk;
+		double distributedInk = (1.0 - alpha) * topItem.second;
+		vector<EQFG_Edge> & edges = nodes[topItem.first].toEntityEdges_;
+		if (edgeType == 1) {
+			edges = nodes[topItem.first].toQueryEdges_;
+		}
+		for (int i = 0; i < edges.size(); ++i) {
+			// No spatial adjustment now
+			double tw = edges[i].w_;
+			double addInk = distributedInk * tw;
+			heap.push(make_pair(edges[i].eid_, addInk));
+		}
+	}
+	// find the result
+	BoundHeap topk(k);
+	for (map<int, double>::iterator i = result.begin(); i != result.end(); ++i) {
+		topk.push(make_pair(i->first, -i->second));
+	}
+	vector<pair<int, double> > reverseRet, ret;
+	while (topk.size() > 0) {
+		pair<int, double> item = topk.pop();
+		reverseRet.push_back(make_pair(item.first, -item.second));
+	}
+	for (int i = 0; i < reverseRet.size(); ++i) {
+		ret.push_back(reverseRet[reverseRet.size() - 1 - i]);
+	}
+	return ret;
 }
+
+
+EQFG_Node::EQFG_Node(int id): id_(id){}
+
+EQFG_Edge::EQFG_Edge(int id1, int id2, double w): sid_(id1), eid_(id2), w_(w){}
+
 EQFG_Edge::EQFG_Edge(const EQFG_Edge & e)
 {
     sid_ = e.sid_;
@@ -91,7 +137,7 @@ void EQFG::saveToFiles(string dirPath)
 
 
 
-EQFG::EQFG(string indexPAth)
+EQFG::EQFG(string indexPAth, int k): k_(k)
 {
 	string line;
 	cerr << "start loading the query nodes." << endl;
@@ -158,4 +204,11 @@ EQFG::EQFG(string indexPAth)
 	}
 	entity2entityIn.close();
 	cerr << "end of building the graph." << endl;
+}
+
+vector<pair<int, double> > EQFG::rec_QFG(int qid)
+{
+	map<int, double> ink;
+	ink[qid] = 1.0;
+	return PPR_BCA(QNodes_, ink, 0.3, 1.0, k_, 1);
 }
