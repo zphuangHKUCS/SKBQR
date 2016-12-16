@@ -38,6 +38,7 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 	}
 	while (heap.size() > 0 && activeInk > 0.0001) {
 		pair<int, double> topItem = heap.pop();
+		cerr << topItem.first << '\t' << topItem.second << endl;
 		double increaseInk = topItem.second * alpha;
 		if (result.find(topItem.first) == result.end()) {
 			result[topItem.first] = 0.0;
@@ -220,6 +221,7 @@ void EQFG::rec_QFG_fromfile(string inPath, string outPath)
 	ofstream out(outPath.c_str(), ios::out);
 	string line;
 	while (getline(in, line)) {
+		cerr << line << endl;
 		if (query2id_.find(line) != query2id_.end()) {
 			int qid = query2id_[line];
 			vector<pair<int, double> > ret = rec_QFG(qid);
