@@ -19,6 +19,9 @@ void loadInputPaths(string pathPath, char** argv)
 		getline(pathin, qlPath);
 		getline(pathin, testPath);
 		getline(pathin, outPath);
+		cerr << qlPath << endl;
+		cerr << testPath << endl;
+		cerr << outPath << endl;
 	}
 	else {
 		getline(pathin, qlPath);
