@@ -28,17 +28,20 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 {
 	// edgeType = 0 for entity PPR
 	// edgeType = 1 for query PPR
-	BoundHeap heap(9999999);
+	BoundHeap heap(999999);
 	double activeInk = 1.0;
 	map<int, double> result;
 
 	// initialize the heap
 	for (map<int, double>::iterator i = initialInk.begin(); i != initialInk.end(); ++i) {
 		heap.push(*i);
+		cerr << "Push " << i->first << endl;
 	}
 	while (heap.size() > 0 && activeInk > 0.001) {
+		//cerr << heap.size() << endl;
 		pair<int, double> topItem = heap.pop();
 		//cerr << activeInk << endl;
+		cerr << topItem.first << '\t' << topItem.second << endl;
 		if (topItem.second < 0.0001) {
 			continue;
 		}
@@ -46,13 +49,19 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 		if (result.find(topItem.first) == result.end()) {
 			result[topItem.first] = 0.0;
 		}
+		cerr << "h1" << endl;
 		result[topItem.first] += increaseInk;
 		activeInk -= increaseInk;
 		double distributedInk = (1.0 - alpha) * topItem.second;
+		if (topItem.first > nodes.size()) continue;
 		vector<EQFG_Edge> & edges = nodes[topItem.first].toEntityEdges_;
 		if (edgeType == 1) {
 			edges = nodes[topItem.first].toQueryEdges_;
 		}
+		if (edges.size() == 0){
+			continue;
+		}
+		cerr << "h2" << endl;
 		for (int i = 0; i < edges.size(); ++i) {
 			// No spatial adjustment now
 			double tw = edges[i].w_;
@@ -62,6 +71,7 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 			heap.push(make_pair(edges[i].eid_, addInk));
 		}
 	}
+	cerr << "Find the top!" << endl;
 	// find the result
 	BoundHeap topk(k);
 	for (map<int, double>::iterator i = result.begin(); i != result.end(); ++i) {
@@ -191,10 +201,14 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 	while (getline(entity2queryIn, line)) {
 		vector<string> strs = split(line, "\t");
 		int sid = atoi(strs[0].c_str());
-		for (int i = 1; i < strs.size(); i += 2) {
+		if (sid > entities_.size()) continue;
+		for (int i = 1; i + 1 < strs.size(); i += 2) {
+			double w = atof(strs[i + 1].c_str());
+			if(w < 0.0001) continue;
+			if(atoi(strs[i].c_str()) > queries_.size()) continue;
 			EQFG_Edge tempEdge(sid, atoi(strs[i].c_str()), atof(strs[i + 1].c_str()));
 			ENodes_[sid].toQueryEdges_.push_back(tempEdge);
-			QNodes_[tempEdge.eid_].toEntityEdges_.push_back(tempEdge);
+			QNodes_[atoi(strs[i].c_str())].toEntityEdges_.push_back(tempEdge);
 		}
 	}
 	entity2queryIn.close();
@@ -228,9 +242,10 @@ vector<pair<int, double> > EQFG::rec_QFG(int qid)
 vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 {
 	// The first PPR
-	cerr << "First" << endl;
+	cerr << "First, QID is " << qid << endl;
 	map<int, double> eink;
 	for (int i = 0; i < QNodes_[qid].toEntityEdges_.size(); ++i) {
+		if(QNodes_[qid].toEntityEdges_[i].sid_ > entities_.size()) continue;
 		eink[QNodes_[qid].toEntityEdges_[i].sid_] = 1.0 / QNodes_[qid].toEntityEdges_.size();
 	}
 	vector<pair<int, double>> eidWeights = PPR_BCA(ENodes_, eink, 0.3, 1.0, NUMOFRELATEDENTITY, 0);
