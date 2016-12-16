@@ -212,3 +212,26 @@ vector<pair<int, double> > EQFG::rec_QFG(int qid)
 	ink[qid] = 1.0;
 	return PPR_BCA(QNodes_, ink, 0.3, 1.0, k_, 1);
 }
+
+void EQFG::rec_QFG_fromfile(string inPath, string outPath)
+{
+	ifstream in(inPath.c_str(), ios::in);
+	ofstream out(outPath.c_str(), ios::out);
+	string line;
+	while (getline(in, line)) {
+		if (query2id_.find(line) != query2id_.end()) {
+			int qid = query2id_[line];
+			vector<pair<int, double> > ret = rec_QFG(qid);
+			out << line;
+			for (int i = 0; i < ret.size(); ++i) {
+				out << '\t' << queries_[ret[i].first] << '\t' << ret[i].second;
+			}
+			out << endl;
+		}
+		else {
+			out << line << endl;
+		}
+	}
+	in.close();
+	out.close();
+}

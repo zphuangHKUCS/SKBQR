@@ -46,6 +46,8 @@ class EQFG
 private:
 	int k_;
 
+	vector<pair<int, double> > rec_QFG(int qid);
+
 public:
     
     map<string, int> query2id_;
@@ -68,7 +70,7 @@ public:
  
     void saveToFiles(string dirPath);
 
-	vector<pair<int, double> > rec_QFG(int qid);
+	void rec_QFG_fromfile(string inputPath, string outPath);
 };
 
 

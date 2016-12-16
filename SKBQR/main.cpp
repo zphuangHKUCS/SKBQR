@@ -8,18 +8,32 @@
 
 using namespace std;
 
-void loadInputPaths(string pathPath, string & qlpath) 
+string qlPath, testPath, outPath;
+
+void loadInputPaths(string pathPath, char** argv)
 {
 	ifstream pathin = ifstream(pathPath.c_str(), ios::in);
-	getline(pathin, qlpath);
+	string line;
+	getline(pathin, line);
+	if (line == "WIN") {
+		getline(pathin, qlPath);
+		getline(pathin, testPath);
+		getline(pathin, outPath);
+	}
+	else {
+		getline(pathin, qlPath);
+		getline(pathin, testPath);
+		getline(pathin, outPath);
+	}
+	
 }
 
 
-int main()
+int main(int argc, char** argv)
 {
-	string qlPath;
-	loadInputPaths("paths.txt", qlPath);
+	
+	loadInputPaths("paths.txt", argv);
 	EQFG eqfg(qlPath);
-	vector<pair<int, double>> result = eqfg.rec_QFG(2);
+	eqfg.rec_QFG_fromfile(testPath, outPath);
 	return 0;
 }
