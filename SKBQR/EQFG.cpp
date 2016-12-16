@@ -36,9 +36,9 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 	for (map<int, double>::iterator i = initialInk.begin(); i != initialInk.end(); ++i) {
 		heap.push(*i);
 	}
-	while (heap.size() > 0 && activeInk > 0.001) {
+	while (heap.size() > 0 && activeInk > 0.0001) {
 		pair<int, double> topItem = heap.pop();
-		cerr << activeInk << endl;
+		//cerr << activeInk << endl;
 		if (topItem.second < 0.00001) {
 			continue;
 		}
@@ -172,8 +172,13 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 	while (getline(query2query_w_in, line)) {
 		vector<string> strs = split(line, "\t");
 		int sid = atoi(strs[0].c_str());
+		if (queries_[sid] == "-")
+			continue;
 		for (int i = 1; i < strs.size(); i += 2) {
-			EQFG_Edge tempEdge(sid, atoi(strs[i].c_str()), atof(strs[i + 1].c_str()));
+			int eid = atoi(strs[i].c_str());
+			if (queries_[eid] == "-")
+				continue;
+			EQFG_Edge tempEdge(sid, eid, atof(strs[i + 1].c_str()));
 			QNodes_[sid].toQueryEdges_.push_back(tempEdge);
 		}
 	}
@@ -224,7 +229,7 @@ void EQFG::rec_QFG_fromfile(string inPath, string outPath)
 	ofstream out(outPath.c_str(), ios::out);
 	string line;
 	while (getline(in, line)) {
-		cerr << line << endl;
+		//cerr << line << endl;
 		if (query2id_.find(line) != query2id_.end()) {
 			int qid = query2id_[line];
 			vector<pair<int, double> > ret = rec_QFG(qid);
