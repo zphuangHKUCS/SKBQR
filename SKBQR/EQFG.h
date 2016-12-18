@@ -24,9 +24,9 @@ using namespace std;
 #define EQFG_PPR_ENTITY_ALPHA 0.3
 #define EQFG_PPR_QUERY_ALPHA 0.3
 
-#define PPR_EPS 0.0001
+#define PPR_EPS 0.001
 #define PPR_IGNORE_INK 0.00001
-#define LOAD_WEIGHT_IGNORE 0.00001
+#define LOAD_WEIGHT_IGNORE 0.001
 
 
 class EQFG_Edge
