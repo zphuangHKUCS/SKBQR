@@ -13,6 +13,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <time.h>
 #include <boost/heap/fibonacci_heap.hpp>
 
 #include "Tools.h"
@@ -28,50 +29,48 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 {
 	// edgeType = 0 for entity PPR
 	// edgeType = 1 for query PPR
-	BoundHeap heap(999999);
-	double activeInk = 1.0;
+	BoundHeap heap(nodes.size());
+	double activeInk = 0.0;
 	map<int, double> result;
 
 	// initialize the heap
 	for (map<int, double>::iterator i = initialInk.begin(); i != initialInk.end(); ++i) {
 		heap.push(*i);
-		cerr << "Push " << i->first << endl;
+		activeInk += i->second;
 	}
-	while (heap.size() > 0 && activeInk > 0.001) {
+
+	while (heap.size() > 0 && activeInk > PPR_EPS) {
 		//cerr << heap.size() << endl;
 		pair<int, double> topItem = heap.pop();
-		//cerr << activeInk << endl;
-		cerr << topItem.first << '\t' << topItem.second << endl;
-		if (topItem.second < 0.0001) {
+		if (topItem.second < PPR_IGNORE_INK) {
 			continue;
 		}
 		double increaseInk = topItem.second * alpha;
 		if (result.find(topItem.first) == result.end()) {
 			result[topItem.first] = 0.0;
 		}
-		cerr << "h1" << endl;
 		result[topItem.first] += increaseInk;
 		activeInk -= increaseInk;
 		double distributedInk = (1.0 - alpha) * topItem.second;
+		
+		// Bug checking
 		if (topItem.first > nodes.size()) continue;
+
 		vector<EQFG_Edge> & edges = nodes[topItem.first].toEntityEdges_;
 		if (edgeType == 1) {
 			edges = nodes[topItem.first].toQueryEdges_;
 		}
-		if (edges.size() == 0){
-			continue;
-		}
-		cerr << "h2" << endl;
 		for (int i = 0; i < edges.size(); ++i) {
 			// No spatial adjustment now
 			double tw = edges[i].w_;
 			double addInk = distributedInk * tw;
-			if (addInk < 0.00001)
-				continue;
+			
+			//if (addInk < 0.00001)
+			//	continue;
+			
 			heap.push(make_pair(edges[i].eid_, addInk));
 		}
 	}
-	cerr << "Find the top!" << endl;
 	// find the result
 	BoundHeap topk(k);
 	for (map<int, double>::iterator i = result.begin(); i != result.end(); ++i) {
@@ -204,8 +203,11 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 		if (sid > entities_.size()) continue;
 		for (int i = 1; i + 1 < strs.size(); i += 2) {
 			double w = atof(strs[i + 1].c_str());
-			if(w < 0.0001) continue;
-			if(atoi(strs[i].c_str()) > queries_.size()) continue;
+			// Ignore too small weights
+			if(w < LOAD_WEIGHT_IGNORE) 
+				continue;
+			if(atoi(strs[i].c_str()) > queries_.size()) 
+				continue;
 			EQFG_Edge tempEdge(sid, atoi(strs[i].c_str()), atof(strs[i + 1].c_str()));
 			ENodes_[sid].toQueryEdges_.push_back(tempEdge);
 			QNodes_[atoi(strs[i].c_str())].toEntityEdges_.push_back(tempEdge);
@@ -236,21 +238,19 @@ vector<pair<int, double> > EQFG::rec_QFG(int qid)
 {
 	map<int, double> ink;
 	ink[qid] = 1.0;
-	return PPR_BCA(QNodes_, ink, 0.3, 1.0, k_, 1);
+	return PPR_BCA(QNodes_, ink, EQFG_PPR_QUERY_ALPHA, 1.0, k_, 1);
 }
 
 vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 {
 	// The first PPR
-	cerr << "First, QID is " << qid << endl;
 	map<int, double> eink;
 	for (int i = 0; i < QNodes_[qid].toEntityEdges_.size(); ++i) {
 		if(QNodes_[qid].toEntityEdges_[i].sid_ > entities_.size()) continue;
 		eink[QNodes_[qid].toEntityEdges_[i].sid_] = 1.0 / QNodes_[qid].toEntityEdges_.size();
 	}
-	vector<pair<int, double>> eidWeights = PPR_BCA(ENodes_, eink, 0.3, 1.0, NUMOFRELATEDENTITY, 0);
+	vector<pair<int, double>> eidWeights = PPR_BCA(ENodes_, eink, EQFG_PPR_ENTITY_ALPHA, 1.0, NUMOFRELATEDENTITY, 0);
 	
-	cerr << "Second" << endl;
 	// The second PPRs
 	map<int, double> qink;
 	for (int i = 0; i < eidWeights.size(); ++i) {
@@ -270,11 +270,13 @@ vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 	}
 	qink[qid] += 1.0 - GAMMA;
 
-	return PPR_BCA(QNodes_, qink, 0.3, 1.0, k_, 1);
+	return PPR_BCA(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 1.0, k_, 1);
 }
 
 void EQFG::rec_QFG_fromfile(string inPath, string outPath)
 {
+	cerr << "Start running QFG reccommendation." << endl;
+	clock_t t1 = clock();
 	ifstream in(inPath.c_str(), ios::in);
 	ofstream out(outPath.c_str(), ios::out);
 	string line;
@@ -295,10 +297,14 @@ void EQFG::rec_QFG_fromfile(string inPath, string outPath)
 	}
 	in.close();
 	out.close();
+	clock_t t2 = clock();
+	cerr << "QFG recommendation takes " << (t2 - t1 + 0.0) / CLOCKS_PER_SEC << "seconds" << endl;
 }
 
 void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
 {
+	cerr << "Start running EQFG reccommendation." << endl;
+	clock_t t1 = clock();
 	ifstream in(inPath.c_str(), ios::in);
 	ofstream out(outPath.c_str(), ios::out);
 	string line;
@@ -319,4 +325,6 @@ void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
 	}
 	in.close();
 	out.close();
+	clock_t t2 = clock();
+	cerr << "EQFG recommendation takes " << (t2 - t1 + 0.0) / CLOCKS_PER_SEC << "seconds" << endl;
 }

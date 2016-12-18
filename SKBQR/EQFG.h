@@ -21,6 +21,10 @@ using namespace std;
 #define NUMOFRELATEDENTITY 20
 #define GAMMA 0.5
 
+#define PPR_EPS 0.0001
+#define PPR_IGNORE_INK 0.00001
+#define LOAD_WEIGHT_IGNORE 0.00001
+
 
 class EQFG_Edge
 {
