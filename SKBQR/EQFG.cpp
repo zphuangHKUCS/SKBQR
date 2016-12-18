@@ -84,6 +84,71 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 	return ret;
 }
 
+vector<pair<int, double>> PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0)
+{
+	// edgeType = 0 for entity PPR
+	// edgeType = 1 for query PPR
+	BoundHeap heap(nodes.size());
+	double activeInk = 0.0;
+	map<int, double> result;
+
+	// initialize the heap
+	for (map<int, double>::iterator i = initialInk.begin(); i != initialInk.end(); ++i) {
+		heap.push(*i);
+		activeInk += i->second;
+	}
+
+	vector<double> inkBuffer(nodes.size(), 0.0);
+
+	while (heap.size() > 0) { //&& activeInk > PPR_EPS) {
+		pair<int, double> topItem = heap.pop();
+		if (topItem.second < PPR_IGNORE_INK) {
+			break;
+		}
+		double increaseInk = topItem.second * alpha;
+		if (result.find(topItem.first) == result.end()) {
+			result[topItem.first] = 0.0;
+		}
+		result[topItem.first] += increaseInk;
+		activeInk -= increaseInk;
+		double distributedInk = (1.0 - alpha) * topItem.second;
+
+		// Bug checking
+		//if (topItem.first > nodes.size()) continue;
+
+		vector<EQFG_Edge> & edges = nodes[topItem.first].toEntityEdges_;
+		if (edgeType == 1) {
+			edges = nodes[topItem.first].toQueryEdges_;
+		}
+		for (int i = 0; i < edges.size(); ++i) {
+			// No spatial adjustment now
+			double tw = edges[i].w_;
+			double addInk = distributedInk * tw;
+
+			// lazy update
+			inkBuffer[edges[i].eid_] += addInk;
+			if (inkBuffer[edges[i].eid_] >= PPR_IGNORE_INK){
+				heap.push(make_pair(edges[i].eid_, inkBuffer[edges[i].eid_]));
+				inkBuffer[edges[i].eid_] = 0.0;
+			}
+			
+		}
+	}
+	// find the result
+	BoundHeap topk(k);
+	for (map<int, double>::iterator i = result.begin(); i != result.end(); ++i) {
+		topk.push(make_pair(i->first, -i->second));
+	}
+	vector<pair<int, double> > reverseRet, ret;
+	while (topk.size() > 0) {
+		pair<int, double> item = topk.pop();
+		reverseRet.push_back(make_pair(item.first, -item.second));
+	}
+	for (int i = 0; i < reverseRet.size(); ++i) {
+		ret.push_back(reverseRet[reverseRet.size() - 1 - i]);
+	}
+	return ret;
+}
 
 EQFG_Node::EQFG_Node(int id): id_(id){}
 
@@ -246,7 +311,9 @@ vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 		if(QNodes_[qid].toEntityEdges_[i].sid_ > entities_.size()) continue;
 		eink[QNodes_[qid].toEntityEdges_[i].sid_] = 1.0 / QNodes_[qid].toEntityEdges_.size();
 	}
-	vector<pair<int, double>> eidWeights = PPR_BCA(ENodes_, eink, EQFG_PPR_ENTITY_ALPHA, 1.0, NUMOFRELATEDENTITY, 0);
+
+	//vector<pair<int, double>> eidWeights = PPR_BCA(ENodes_, eink, EQFG_PPR_ENTITY_ALPHA, 1.0, NUMOFRELATEDENTITY, 0);
+	vector<pair<int, double>> eidWeights = PPR_BCA_lazy(ENodes_, eink, EQFG_PPR_ENTITY_ALPHA, 1.0, NUMOFRELATEDENTITY, 0);
 	
 	// The second PPRs
 	map<int, double> qink;
@@ -267,7 +334,8 @@ vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 	}
 	qink[qid] += 1.0 - GAMMA;
 
-	return PPR_BCA(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 1.0, k_, 1);
+	//return PPR_BCA(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 1.0, k_, 1);
+	return PPR_BCA_lazy(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 1.0, k_, 1);
 }
 
 void EQFG::rec_QFG_fromfile(string inPath, string outPath)
