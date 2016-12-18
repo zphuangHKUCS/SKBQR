@@ -39,11 +39,11 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 		activeInk += i->second;
 	}
 
-	while (heap.size() > 0 && activeInk > PPR_EPS) {
+	while (heap.size() > 0){ //&& activeInk > PPR_EPS) {
 		//cerr << heap.size() << endl;
 		pair<int, double> topItem = heap.pop();
 		if (topItem.second < PPR_IGNORE_INK) {
-			continue;
+			break;
 		}
 		double increaseInk = topItem.second * alpha;
 		if (result.find(topItem.first) == result.end()) {
@@ -54,7 +54,7 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 		double distributedInk = (1.0 - alpha) * topItem.second;
 		
 		// Bug checking
-		if (topItem.first > nodes.size()) continue;
+		//if (topItem.first > nodes.size()) continue;
 
 		vector<EQFG_Edge> & edges = nodes[topItem.first].toEntityEdges_;
 		if (edgeType == 1) {
@@ -64,9 +64,6 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 			// No spatial adjustment now
 			double tw = edges[i].w_;
 			double addInk = distributedInk * tw;
-			
-			//if (addInk < 0.00001)
-			//	continue;
 			
 			heap.push(make_pair(edges[i].eid_, addInk));
 		}
