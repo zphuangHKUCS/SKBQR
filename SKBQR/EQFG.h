@@ -62,6 +62,12 @@ public:
     
     map<string, int> query2id_;
     map<string, int> entity2id_;
+
+	map<string, int> loc2id_;
+	vector< pair<double, double> > loc2cor_;
+	vector<string> locations_;
+
+	map<int, map<int, double>> query2loc_;
     //map<string, int> doc2id_;
 	
 	//map<int, map<int, double>> entity2docPro_;
@@ -82,7 +88,7 @@ public:
 
 	void rec_QFG_fromfile(string inputPath, string outPath);
 	void rec_EQFG_fromfile(string inputPath, string outPath);
-
+	void loadLocation(const string locDir);
 
 };
 

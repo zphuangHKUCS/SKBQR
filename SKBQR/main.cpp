@@ -8,7 +8,7 @@
 
 using namespace std;
 
-string qlPath, testPath, outPath;
+string qlPath, testPath, locDir, outPath;
 
 void loadInputPaths(string pathPath, char** argv)
 {
@@ -18,11 +18,13 @@ void loadInputPaths(string pathPath, char** argv)
 	if (line == "WIN") {
 		getline(pathin, qlPath);
 		getline(pathin, testPath);
+		getline(pathin, locDir);
 		getline(pathin, outPath);
 	}
 	else {
 		getline(pathin, qlPath);
 		getline(pathin, testPath);
+		getline(pathin, locDir);
 		getline(pathin, outPath);
 	}
 	
@@ -33,7 +35,10 @@ int main(int argc, char** argv)
 {
 	loadInputPaths("paths.txt", argv);
 	EQFG eqfg(qlPath);
-	eqfg.rec_EQFG_fromfile(testPath, outPath);
+	
+	eqfg.loadLocation(locDir);
+	
+	//eqfg.rec_EQFG_fromfile(testPath, outPath);
 	//vector<pair<int, double>> temp = eqfg.rec_EQFG(1079514);
 	return 0;
 }

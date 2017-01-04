@@ -25,6 +25,7 @@ double spatialAdjustWeight() {
 	return 0.0;
 }
 
+
 vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0)
 {
 	// edgeType = 0 for entity PPR
@@ -148,6 +149,43 @@ vector<pair<int, double>> PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int, doubl
 		ret.push_back(reverseRet[reverseRet.size() - 1 - i]);
 	}
 	return ret;
+}
+
+
+void EQFG::loadLocation(const string locPath)
+{
+	string loc2corPath = locPath + "loc2cor";
+	ifstream loc2corIn(loc2corPath.c_str(), ios::in);
+	string line;
+	cerr << "Starting reading " << loc2corPath << endl;
+	while(getline(loc2corIn, line))	{
+		vector<string> strs = split(line);
+		if (strs.size() != 3)
+			continue;
+		loc2id_[strs[0]] = locations_.size();
+		loc2cor_.push_back(make_pair(atof(strs[1].c_str()), atof(strs[2].c_str())));
+		locations_.push_back(strs[0]);
+	}
+	loc2corIn.close();
+
+	string query2locPath = locPath + "query2loc.txt";
+	cerr << "Starting reading " << query2locPath << endl;
+	ifstream query2locIn(query2locPath.c_str(), ios::in);
+	while (getline(query2locIn, line)) {
+		vector<string> strs = split(line);
+		map<int, double> tempMap;
+		int sum = 0;
+		for (int i = 1; i < strs.size(); i += 2) {
+			int count = atoi(strs[i + 1].c_str());
+			tempMap[loc2id_[strs[i]]] = count;
+			sum += count;
+		}
+		for (map<int, double>::iterator i = tempMap.begin(); i != tempMap.end(); ++i) {
+			i->second /= sum;
+		}
+		query2loc_[query2id_[strs[0]]] = tempMap;
+	}
+	query2locIn.close();
 }
 
 EQFG_Node::EQFG_Node(int id): id_(id){}
