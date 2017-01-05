@@ -13,6 +13,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 #include <time.h>
 #include <boost/heap/fibonacci_heap.hpp>
 
@@ -21,12 +22,44 @@
 
 using namespace std;
 
-double spatialAdjustWeight() {
-	return 0.0;
+
+
+
+double getDistance(double lat1, double lon1, double lat2, double lon2)
+{
+	/*
+	C = sin(MLatA)*sin(MLatB)*cos(MLonA-MLonB) + cos(MLatA)*cos(MLatB)
+	Distance = R*Arccos(C)*Pi/180
+	*/
+	double pi = 3.14159265358979323846;
+	double Mlat1 = lat1 * pi / 180;
+	double Mlat2 = lat2 * pi / 180;
+	double Mlon1 = lon1 * pi / 180;
+	double Mlon2 = lon2 * pi / 180;
+	double C = sin(Mlat1) * sin(Mlat2) + cos(Mlon1 - Mlon2) * cos(Mlat1) * cos(Mlat2);
+	double dis = acos(C) * 180 * 60 * 1.1515 * 1609.344 / pi;
+	return dis;
+}
+
+double EQFG::getSpatialSim(int qid) // the user's location is stored in a global varible Ulat, Ulon
+{
+	double ret = 0.0;
+	map<int, double> & locMap = this->query2loc_[qid];
+	for (map<int, double>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
+		if (getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second) <= DIS_THRESHOLD) {
+			ret += i->second;
+		}
+	}
+	return ret;
+}
+
+double EQFG::spatialAdjustWeight(int qid, double w, double beta) 
+{
+	return beta * w + (1 - beta) * getSpatialSim(qid);
 }
 
 
-vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0)
+vector<pair<int, double>> EQFG::PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType)
 {
 	// edgeType = 0 for entity PPR
 	// edgeType = 1 for query PPR
@@ -62,10 +95,12 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 			edges = nodes[topItem.first].toQueryEdges_;
 		}
 		for (int i = 0; i < edges.size(); ++i) {
-			// No spatial adjustment now
 			double tw = edges[i].w_;
+			if (edgeType == 1) {
+				// Adjust the weights for query2query edges
+				tw = spatialAdjustWeight(edges[i].eid_, tw, beta);
+			}
 			double addInk = distributedInk * tw;
-			
 			heap.push(make_pair(edges[i].eid_, addInk));
 		}
 	}
@@ -85,7 +120,7 @@ vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & 
 	return ret;
 }
 
-vector<pair<int, double>> PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0)
+vector<pair<int, double>> EQFG::PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType)
 {
 	// edgeType = 0 for entity PPR
 	// edgeType = 1 for query PPR
@@ -122,8 +157,11 @@ vector<pair<int, double>> PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int, doubl
 			edges = nodes[topItem.first].toQueryEdges_;
 		}
 		for (int i = 0; i < edges.size(); ++i) {
-			// No spatial adjustment now
 			double tw = edges[i].w_;
+			if (edgeType == 1) {
+				// Adjust the weights for query2query edges
+				tw = spatialAdjustWeight(edges[i].eid_, tw, beta);
+			}
 			double addInk = distributedInk * tw;
 
 			// lazy update
@@ -199,9 +237,6 @@ EQFG_Edge::EQFG_Edge(const EQFG_Edge & e)
     w_ = e.w_;
 }
 
-
-
-
 void EQFG::saveToFiles(string dirPath)
 {
 	cerr << "start saveing the query log to " << dirPath << endl;
@@ -247,11 +282,6 @@ void EQFG::saveToFiles(string dirPath)
     }
     entity2entity_w_out.close();
 }
-
-
-
-
-
 
 EQFG::EQFG(string indexPAth, int k): k_(k)
 {
@@ -373,7 +403,7 @@ vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 	qink[qid] += 1.0 - GAMMA;
 
 	//return PPR_BCA(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 1.0, k_, 1);
-	return PPR_BCA_lazy(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 1.0, k_, 1);
+	return PPR_BCA_lazy(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0, k_, 1);
 }
 
 void EQFG::rec_QFG_fromfile(string inPath, string outPath)

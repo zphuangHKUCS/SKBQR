@@ -28,6 +28,9 @@ using namespace std;
 #define PPR_IGNORE_INK 0.00001
 #define LOAD_WEIGHT_IGNORE 0.001
 
+#define DIS_THRESHOLD 10000 // range equals 10km
+//#define PRO_THRESHOLD 0.1   // the probability that falling within the range no less than 0.1
+
 
 class EQFG_Edge
 {
@@ -53,6 +56,15 @@ public:
 
 class EQFG
 {
+private:
+	// The location of the user
+	double Ulat = 0.0, Ulon = 0.0;
+
+	vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
+	vector<pair<int, double>> PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
+	double spatialAdjustWeight(int qid, double w, double beta);
+	double getSpatialSim(int qid);
+
 public:
 	int k_;
 	vector<pair<int, double> > rec_QFG(int qid);
@@ -92,5 +104,6 @@ public:
 
 };
 
+double getDistance(double, double, double, double);
 
 #endif /* defined(__EQFG__EQFG__) */

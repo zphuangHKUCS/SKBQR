@@ -5,7 +5,6 @@
 #include <cstdio>
 #include "EQFG.h"
 
-
 using namespace std;
 
 string qlPath, testPath, locDir, outPath;
@@ -33,12 +32,11 @@ void loadInputPaths(string pathPath, char** argv)
 
 int main(int argc, char** argv)
 {
+
 	loadInputPaths("paths.txt", argv);
 	EQFG eqfg(qlPath);
-	
 	eqfg.loadLocation(locDir);
 	
-	//eqfg.rec_EQFG_fromfile(testPath, outPath);
-	//vector<pair<int, double>> temp = eqfg.rec_EQFG(1079514);
+	eqfg.rec_EQFG_fromfile(testPath, outPath);
 	return 0;
 }
