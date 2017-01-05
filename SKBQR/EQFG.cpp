@@ -403,7 +403,7 @@ vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 	qink[qid] += 1.0 - GAMMA;
 
 	//return PPR_BCA(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 1.0, k_, 1);
-	return PPR_BCA_lazy(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0, k_, 1);
+	return PPR_BCA_lazy(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, k_, 1);
 }
 
 void EQFG::rec_QFG_fromfile(string inPath, string outPath)
