@@ -156,13 +156,33 @@ vector<pair<int, double>> EQFG::PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int,
 		if (edgeType == 1) {
 			edges = nodes[topItem.first].toQueryEdges_;
 		}
+		vector<double> weights;
+		double wSum = 0.0;
+		if (edgeType == 1) {
+			for (int i = 0; i < edges.size(); ++i) {
+				double spatialWeight = spatialAdjustWeight(edges[i].eid_, edges[i].w_, beta);
+				wSum += spatialWeight;
+				weights.push_back(spatialWeight);
+			}
+			for (int i = 0; i < edges.size(); ++i) {
+				weights[i] /= wSum;
+			}
+		}
+		else {
+			for (int i = 0; i < edges.size(); ++i) {
+				weights.push_back(edges[i].w_);
+			}
+		}
+
 		for (int i = 0; i < edges.size(); ++i) {
+			/*
 			double tw = edges[i].w_;
 			if (edgeType == 1) {
 				// Adjust the weights for query2query edges
 				tw = spatialAdjustWeight(edges[i].eid_, tw, beta);
 			}
-			double addInk = distributedInk * tw;
+			*/
+			double addInk = distributedInk * weights[i];
 
 			// lazy update
 			inkBuffer[edges[i].eid_] += addInk;
