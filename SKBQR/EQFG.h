@@ -59,7 +59,8 @@ class EQFG
 private:
 	// The location of the user
 	// HK  22.2833 114.15
-	double Ulat = 22.2833, Ulon = 114.15;
+	// California 40.0689	-79.8732
+	double Ulat = 40.0689, Ulon = -79.8732;
 
 	vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
 	vector<pair<int, double>> PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
