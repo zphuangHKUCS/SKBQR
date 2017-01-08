@@ -61,7 +61,9 @@ private:
 	// HK  22.2833 114.15
 	// California 40.0689	-79.8732
 	// New York 40.7504	-73.9963
-	double Ulat = 40.7504, Ulon = -73.9963;
+	// harverd 38.922558, -77.019416
+	// Bonston 42.3706	-71.027
+	double Ulat = 42.3706, Ulon = -71.027;
 
 	vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
 	vector<pair<int, double>> PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
