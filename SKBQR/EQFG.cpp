@@ -298,6 +298,7 @@ void EQFG::loadLocation(const string locPath)
 	loc2corIn.close();
 
 	string query2locPath = locPath + "query2loc.txt";
+	int enum_q2l = 0;
 	cerr << "Starting reading " << query2locPath << endl;
 	ifstream query2locIn(query2locPath.c_str(), ios::in);
 	while (getline(query2locIn, line)) {
@@ -311,10 +312,13 @@ void EQFG::loadLocation(const string locPath)
 		}
 		for (map<int, double>::iterator i = tempMap.begin(); i != tempMap.end(); ++i) {
 			i->second /= sum;
+			enum_q2l += 1;
 		}
 		query2loc_[query2id_[strs[0]]] = tempMap;
 	}
 	query2locIn.close();
+	cerr << "#location:" << '\t' << locations_.size() << endl;
+	cerr << "#edge_q2l:" << '\t' << enum_q2l << endl;
 }
 
 EQFG_Node::EQFG_Node(int id): id_(id){}
@@ -401,6 +405,7 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 	cerr << "start loading the query2query edges." << endl;
 	string tempPath = indexPAth + "query2query_w.txt";
 	ifstream query2query_w_in(tempPath.c_str(), ios::in);
+	int enum_q2q = 0, enum_e2q = 0, enum_e2e = 0;
 	while (getline(query2query_w_in, line)) {
 		vector<string> strs = split(line, "\t");
 		int sid = atoi(strs[0].c_str());
@@ -412,6 +417,7 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 				continue;
 			EQFG_Edge tempEdge(sid, eid, atof(strs[i + 1].c_str()));
 			QNodes_[sid].toQueryEdges_.push_back(tempEdge);
+			enum_q2q += 1;
 		}
 	}
 	query2idIn.close();
@@ -432,6 +438,7 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 			EQFG_Edge tempEdge(sid, atoi(strs[i].c_str()), atof(strs[i + 1].c_str()));
 			ENodes_[sid].toQueryEdges_.push_back(tempEdge);
 			QNodes_[atoi(strs[i].c_str())].toEntityEdges_.push_back(tempEdge);
+			enum_e2q += 1;
 		}
 	}
 	entity2queryIn.close();
@@ -446,6 +453,7 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 			EQFG_Edge tempEdge(sid, atoi(strs[i].c_str()), atof(strs[i + 1].c_str()));
 			sum += atof(strs[i + 1].c_str());
 			ENodes_[sid].toEntityEdges_.push_back(tempEdge);
+			enum_e2e += 1;
 		}
 		for (int i = 0; i < ENodes_[sid].toEntityEdges_.size(); i++) {
 			ENodes_[sid].toEntityEdges_[i].w_ /= sum;
@@ -453,6 +461,12 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 	}
 	entity2entityIn.close();
 	cerr << "end of building the graph." << endl;
+
+	cerr << "#query:" << '\t' << queries_.size() << endl;
+	cerr << "#entity:" << '\t' << entities_.size() << endl;
+	cerr << "#edge_q2q:" << '\t' << enum_q2q << endl;
+	cerr << "#edge_e2q:" << '\t' << enum_e2q << endl;
+	cerr << "#edge_e2e:" << '\t' << enum_e2e << endl;
 }
 
 vector<pair<int, double> > EQFG::rec_QFG(int qid)
