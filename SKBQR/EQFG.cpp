@@ -232,7 +232,8 @@ vector<pair<int, double>> EQFG::PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int,
 		double wSum = 0.0;
 		if (edgeType == 1) {
 			for (int i = 0; i < edges.size(); ++i) {
-				double spatialWeight = spatialAdjustWeight(edges[i].eid_, edges[i].w_, beta);
+				//double spatialWeight = spatialAdjustWeight(edges[i].eid_, edges[i].w_, beta);
+				double spatialWeight = edges[i].w_;
 				wSum += spatialWeight;
 				weights.push_back(spatialWeight);
 			}
@@ -501,8 +502,8 @@ vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 	}
 	qink[qid] += 1.0 - GAMMA;
 
-	return PPR_BCA(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, k_, 1);
-	//return PPR_BCA_lazy(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, k_, 1);
+	//return PPR_BCA(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, k_, 1);
+	return PPR_BCA_lazy(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, k_, 1);
 }
 
 void EQFG::rec_QFG_fromfile(string inPath, string outPath)
