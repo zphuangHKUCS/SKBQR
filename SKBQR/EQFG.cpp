@@ -97,8 +97,8 @@ vector<pair<int, double>> EQFG::PPR_BCA(vector<EQFG_Node> & nodes, map<int, doub
 		double wSum = 0.0;
 		if (edgeType == 1) {
 			for (int i = 0; i < edges.size(); ++i) {
-				//double spatialWeight = spatialAdjustWeight(edges[i].eid_, edges[i].w_, beta);
-				double spatialWeight = edges[i].w_;
+				double spatialWeight = spatialAdjustWeight(edges[i].eid_, edges[i].w_, beta);
+				//double spatialWeight = edges[i].w_;
 				wSum += spatialWeight;
 				weights.push_back(spatialWeight);
 			}
@@ -232,8 +232,8 @@ vector<pair<int, double>> EQFG::PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int,
 		double wSum = 0.0;
 		if (edgeType == 1) {
 			for (int i = 0; i < edges.size(); ++i) {
-				//double spatialWeight = spatialAdjustWeight(edges[i].eid_, edges[i].w_, beta);
-				double spatialWeight = edges[i].w_;
+				double spatialWeight = spatialAdjustWeight(edges[i].eid_, edges[i].w_, beta);
+				//double spatialWeight = edges[i].w_;
 				wSum += spatialWeight;
 				weights.push_back(spatialWeight);
 			}
@@ -480,8 +480,8 @@ vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 		eink[QNodes_[qid].toEntityEdges_[i].sid_] = 1.0 / QNodes_[qid].toEntityEdges_.size();
 	}
 
-	vector<pair<int, double>> eidWeights = PPR_BCA(ENodes_, eink, EQFG_PPR_ENTITY_ALPHA, 1.0, NUMOFRELATEDENTITY, 0);
-	//vector<pair<int, double>> eidWeights = PPR_BCA_lazy(ENodes_, eink, EQFG_PPR_ENTITY_ALPHA, 1.0, NUMOFRELATEDENTITY, 0);
+	//vector<pair<int, double>> eidWeights = PPR_BCA(ENodes_, eink, EQFG_PPR_ENTITY_ALPHA, 1.0, NUMOFRELATEDENTITY, 0);
+	vector<pair<int, double>> eidWeights = PPR_BCA_lazy(ENodes_, eink, EQFG_PPR_ENTITY_ALPHA, 1.0, NUMOFRELATEDENTITY, 0);
 	
 	// The second PPRs
 	map<int, double> qink;
