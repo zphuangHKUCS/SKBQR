@@ -97,7 +97,8 @@ vector<pair<int, double>> EQFG::PPR_BCA(vector<EQFG_Node> & nodes, map<int, doub
 		double wSum = 0.0;
 		if (edgeType == 1) {
 			for (int i = 0; i < edges.size(); ++i) {
-				double spatialWeight = spatialAdjustWeight(edges[i].eid_, edges[i].w_, beta);
+				//double spatialWeight = spatialAdjustWeight(edges[i].eid_, edges[i].w_, beta);
+				double spatialWeight = edges[i].w_;
 				wSum += spatialWeight;
 				weights.push_back(spatialWeight);
 			}
