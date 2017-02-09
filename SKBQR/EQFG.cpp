@@ -278,9 +278,10 @@ vector<pair<int, double>> EQFG::PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int,
 		ret.push_back(reverseRet[reverseRet.size() - 1 - i]);
 	}
 	t4 = clock();
-	if(edgeType == 1)
+	if (edgeType == 1) {
 		cerr << "                     EQFG takes:\t" << (t4 - t3 + 0.0) / CLOCKS_PER_SEC << " seconds" << endl;
 		cerr << "sptaial adjusting weights takes:\t" << timeforsptaial << " seconds" << endl;
+	}
 	
 
 	return ret;
