@@ -53,8 +53,8 @@ double getDistance_app(double lat1, double lon1, double lat2, double lon2)
 double EQFG::getSpatialSim(int qid) // the user's location is stored in a global varible Ulat, Ulon
 {
 	double ret = 0.0;
-	map<int, double> & locMap = this->query2loc_[qid];
-	for (map<int, double>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
+	map<int, float> & locMap = this->query2loc_[qid];
+	for (map<int, float>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
 		if (getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second) <= DIS_THRESHOLD) {
 			ret += i->second;
 		}
@@ -65,8 +65,8 @@ double EQFG::getSpatialSim(int qid) // the user's location is stored in a global
 double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 {
 	double ret = 0.0;
-	map<int, double> & locMap = QNodes_[qid].p2loc_[this->loc2partition_[UlocID]];
-	for (map<int, double>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
+	map<int, float> & locMap = QNodes_[qid].p2loc_[this->loc2partition_[UlocID]];
+	for (map<int, float>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
 		if (getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second) <= DIS_THRESHOLD) {
 			ret += i->second;
 		}
@@ -352,19 +352,19 @@ void EQFG::loadLocation(const string locPath)
 	while (getline(query2locIn, line)) {
 		vector<string> strs = split(line);
 		int qid = query2id_[strs[0]];
-		map<int, double> tempMap;
+		map<int, float> tempMap;
 		int sum = 0;
 		for (int i = 1; i < strs.size(); i += 2) {
 			int count = atoi(strs[i + 1].c_str());
 			tempMap[loc2id_[strs[i]]] = count;
 			sum += count;
 		}
-		for (map<int, double>::iterator i = tempMap.begin(); i != tempMap.end(); ++i) {
+		for (map<int, float>::iterator i = tempMap.begin(); i != tempMap.end(); ++i) {
 			i->second /= sum;
 			enum_q2l += 1;
 			pair<int, int> p = loc2partition_[i->first];
 			if (QNodes_[qid].p2loc_.find(p) == QNodes_[qid].p2loc_.end()) {
-				QNodes_[qid].p2loc_[p] = map<int, double>();
+				QNodes_[qid].p2loc_[p] = map<int, float>();
 			}
 			QNodes_[qid].p2loc_[p][i->first] = i->second;
 		}
@@ -378,7 +378,7 @@ void EQFG::loadLocation(const string locPath)
 
 EQFG_Node::EQFG_Node(int id): id_(id){}
 
-EQFG_Edge::EQFG_Edge(int id1, int id2, double w): sid_(id1), eid_(id2), w_(w){}
+EQFG_Edge::EQFG_Edge(int id1, int id2, float w): sid_(id1), eid_(id2), w_(w){}
 
 EQFG_Edge::EQFG_Edge(const EQFG_Edge & e)
 {

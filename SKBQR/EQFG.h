@@ -36,8 +36,8 @@ class EQFG_Edge
 {
 public:
     int sid_, eid_;
-    double w_;
-    EQFG_Edge(int id1, int id2, double w);
+    float w_;
+    EQFG_Edge(int id1, int id2, float w);
     EQFG_Edge(const EQFG_Edge & e);
 };
 
@@ -48,7 +48,7 @@ public:
     vector<EQFG_Edge> toQueryEdges_; // outedges
     //vector<EQFG_Edge> inQueryEdges_; // inedges
     vector<EQFG_Edge> toEntityEdges_;
-	map<pair<int, int>, map<int, double>> p2loc_;
+	map<pair<int, int>, map<int, float>> p2loc_;
 	
 	EQFG_Node(int id);
 
@@ -66,7 +66,7 @@ private:
 	// New York 40.7504	-73.9963
 	// harverd 38.922558, -77.019416
 	// Boston 42.3706	-71.027
-	double Ulat = 42.3706, Ulon = -71.027;
+	float Ulat = 42.3706, Ulon = -71.027;
 	int UlocID = 5378;
 
 	vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
@@ -89,10 +89,10 @@ public:
     map<string, int> entity2id_;
 
 	map<string, int> loc2id_;
-	vector< pair<double, double> > loc2cor_;
+	vector< pair<float, float> > loc2cor_;
 	vector<string> locations_;
 
-	map<int, map<int, double>> query2loc_;
+	map<int, map<int, float>> query2loc_;
     //map<string, int> doc2id_;
 	
 	//map<int, map<int, double>> entity2docPro_;
@@ -117,6 +117,5 @@ public:
 
 };
 
-double getDistance(double, double, double, double);
 
 #endif /* defined(__EQFG__EQFG__) */
