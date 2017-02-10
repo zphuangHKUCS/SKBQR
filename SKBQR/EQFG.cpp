@@ -550,8 +550,8 @@ vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 		eink[QNodes_[qid].toEntityEdges_[i].sid_] = 1.0 / QNodes_[qid].toEntityEdges_.size();
 	}
 
-	vector<pair<int, double>> eidWeights = PPR_BCA(ENodes_, eink, EQFG_PPR_ENTITY_ALPHA, 1.0, NUMOFRELATEDENTITY, 0);
-	//vector<pair<int, double>> eidWeights = PPR_BCA_lazy(ENodes_, eink, EQFG_PPR_ENTITY_ALPHA, 1.0, NUMOFRELATEDENTITY, 0);
+	//vector<pair<int, double>> eidWeights = PPR_BCA(ENodes_, eink, EQFG_PPR_ENTITY_ALPHA, 1.0, NUMOFRELATEDENTITY, 0);
+	vector<pair<int, double>> eidWeights = PPR_BCA_lazy(ENodes_, eink, EQFG_PPR_ENTITY_ALPHA, 1.0, NUMOFRELATEDENTITY, 0);
 	
 	// The second PPRs
 	map<int, double> qink;
@@ -572,8 +572,8 @@ vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 	}
 	qink[qid] += 1.0 - GAMMA;
 
-	return PPR_BCA(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, k_, 1);
-	//return PPR_BCA_lazy(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, k_, 1);
+	//return PPR_BCA(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, k_, 1);
+	return PPR_BCA_lazy(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, k_, 1);
 }
 
 void EQFG::rec_QFG_fromfile(string inPath, string outPath)
