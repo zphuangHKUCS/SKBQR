@@ -18,7 +18,7 @@
 
 using namespace std;
 
-#define NUMOFRELATEDENTITY 20
+#define NUMOFRELATEDENTITY 10
 #define GAMMA 0.5
 
 #define EQFG_PPR_ENTITY_ALPHA 0.15

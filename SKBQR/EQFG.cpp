@@ -65,7 +65,7 @@ double EQFG::getSpatialSim(int qid) // the user's location is stored in a global
 double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 {
 	// testing
-	return 0.2;
+	//return 0.2;
 	double ret = 0.0;
 	map<int, float> & locMap = QNodes_[qid].p2loc_[this->loc2partition_[UlocID]];
 	//cerr << locMap.size() << endl;
@@ -80,8 +80,8 @@ double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 
 double EQFG::spatialAdjustWeight(int qid, double w, double beta) 
 {
-	//return beta * w + (1 - beta) * getSpatialSim(qid);
-	return beta * w + (1 - beta) * getSpatialSim_p(qid);
+	return beta * w + (1 - beta) * getSpatialSim(qid);
+	//return beta * w + (1 - beta) * getSpatialSim_p(qid);
 }
 
 
