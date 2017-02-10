@@ -50,6 +50,7 @@ double EQFG::getSpatialSim(int qid) // the user's location is stored in a global
 			ret += i->second;
 		}
 	}
+	cerr << ret << endl;
 	return ret;
 }
 
@@ -237,7 +238,6 @@ vector<pair<int, double>> EQFG::PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int,
 			for (int i = 0; i < edges.size(); ++i) {
 				t1 = clock();
 				double spatialWeight = spatialAdjustWeight(edges[i].eid_, edges[i].w_, beta);
-				cerr << spatialWeight << endl;
 				t2 = clock();
 				timeforsptaial += (t2 - t1 + 0.0) / CLOCKS_PER_SEC;
 				//double spatialWeight = edges[i].w_;
