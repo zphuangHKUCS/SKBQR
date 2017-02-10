@@ -53,6 +53,18 @@ double getDistance_app(double lat1, double lon1, double lat2, double lon2)
 double EQFG::getSpatialSim(int qid) // the user's location is stored in a global varible Ulat, Ulon
 {
 	double ret = 0.0;
+	for (map<pair<int, int>, map<int, float>>::iterator iter = QNodes_[qid].p2loc_.begin(); iter != QNodes_[qid].p2loc_.end(); ++iter) {
+		map<int, float> & locMap = iter->second;
+		//cerr << locMap.size() << endl;
+		for (map<int, float>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
+			if (getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second) <= DIS_THRESHOLD) {
+				ret += i->second;
+			}
+		}
+	}
+	return ret;
+	/*
+	double ret = 0.0;
 	map<int, float> & locMap = this->query2loc_[qid];
 	for (map<int, float>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
 		if (getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second) <= DIS_THRESHOLD) {
@@ -61,6 +73,7 @@ double EQFG::getSpatialSim(int qid) // the user's location is stored in a global
 	}
 	//cerr << ret << endl;
 	return ret;
+	*/
 }
 double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 {
@@ -80,8 +93,8 @@ double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 
 double EQFG::spatialAdjustWeight(int qid, double w, double beta) 
 {
-	//return beta * w + (1 - beta) * getSpatialSim(qid);
-	return beta * w + (1 - beta) * getSpatialSim_p(qid);
+	return beta * w + (1 - beta) * getSpatialSim(qid);
+	//return beta * w + (1 - beta) * getSpatialSim_p(qid);
 }
 
 
