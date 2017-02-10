@@ -64,6 +64,8 @@ double EQFG::getSpatialSim(int qid) // the user's location is stored in a global
 }
 double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 {
+	// testing
+	return 0.2;
 	double ret = 0.0;
 	map<int, float> & locMap = QNodes_[qid].p2loc_[this->loc2partition_[UlocID]];
 	//cerr << locMap.size() << endl;
