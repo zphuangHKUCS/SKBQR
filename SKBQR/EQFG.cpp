@@ -25,19 +25,19 @@ using namespace std;
 
 
 
-double getDistance(double lat1, double lon1, double lat2, double lon2)
+double getDistance(float lat1, float lon1, float lat2, float lon2)
 {
 	/*
 	C = sin(MLatA)*sin(MLatB)*cos(MLonA-MLonB) + cos(MLatA)*cos(MLatB)
 	Distance = R*Arccos(C)*Pi/180
 	*/
-	double pi = 3.14159265358979323846;
-	double Mlat1 = lat1 * pi / 180;
-	double Mlat2 = lat2 * pi / 180;
-	double Mlon1 = lon1 * pi / 180;
-	double Mlon2 = lon2 * pi / 180;
-	double C = sin(Mlat1) * sin(Mlat2) + cos(Mlon1 - Mlon2) * cos(Mlat1) * cos(Mlat2);
-	double dis = acos(C) * 180 * 60 * 1.1515 * 1609.344 / pi;
+	float pi = 3.14159265358979323846;
+	float Mlat1 = lat1 * pi / 180;
+	float Mlat2 = lat2 * pi / 180;
+	float Mlon1 = lon1 * pi / 180;
+	float Mlon2 = lon2 * pi / 180;
+	float C = sin(Mlat1) * sin(Mlat2) + cos(Mlon1 - Mlon2) * cos(Mlat1) * cos(Mlat2);
+	float dis = acos(C) * 20014123.8528 / pi;
 	return dis;
 }
 double getDistance_app(double lat1, double lon1, double lat2, double lon2)
@@ -66,6 +66,7 @@ double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 {
 	double ret = 0.0;
 	map<int, float> & locMap = QNodes_[qid].p2loc_[this->loc2partition_[UlocID]];
+	cerr << locMap.size() << endl;
 	for (map<int, float>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
 		if (getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second) <= DIS_THRESHOLD) {
 			ret += i->second;
