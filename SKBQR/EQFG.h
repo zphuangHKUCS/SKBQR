@@ -48,7 +48,10 @@ public:
     vector<EQFG_Edge> toQueryEdges_; // outedges
     //vector<EQFG_Edge> inQueryEdges_; // inedges
     vector<EQFG_Edge> toEntityEdges_;
-    EQFG_Node(int id);
+	map<pair<int, int>, map<int, double>> p2loc_;
+	
+	EQFG_Node(int id);
+
 };
 
 
@@ -62,13 +65,15 @@ private:
 	// California 40.0689	-79.8732
 	// New York 40.7504	-73.9963
 	// harverd 38.922558, -77.019416
-	// Bonston 42.3706	-71.027
+	// Boston 42.3706	-71.027
 	double Ulat = 42.3706, Ulon = -71.027;
+	int UlocID = 5378;
 
 	vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
 	vector<pair<int, double>> PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
 	double spatialAdjustWeight(int qid, double w, double beta);
 	double getSpatialSim(int qid);
+	double getSpatialSim_p(int qid);
 
 public:
 	int k_;
@@ -77,6 +82,9 @@ public:
 
 public:
     
+	map<pair<int, int>, vector<int>> partition_;
+	vector<pair<int, int>> loc2partition_;
+
     map<string, int> query2id_;
     map<string, int> entity2id_;
 

@@ -40,7 +40,16 @@ double getDistance(double lat1, double lon1, double lat2, double lon2)
 	double dis = acos(C) * 180 * 60 * 1.1515 * 1609.344 / pi;
 	return dis;
 }
-
+double getDistance_app(double lat1, double lon1, double lat2, double lon2)
+{
+	// return approximate distance
+	double dis = 0.0;
+	dis += (lat1 - lat2) * (lat1 - lat2);
+	dis += (lon2 - lon1) * (lon2 - lon1);
+	dis = sqrt(dis);
+	dis *= 1000;
+	return dis;
+}
 double EQFG::getSpatialSim(int qid) // the user's location is stored in a global varible Ulat, Ulon
 {
 	double ret = 0.0;
@@ -50,13 +59,26 @@ double EQFG::getSpatialSim(int qid) // the user's location is stored in a global
 			ret += i->second;
 		}
 	}
-	cerr << ret << endl;
+	//cerr << ret << endl;
+	return ret;
+}
+double EQFG::getSpatialSim_p(int qid) // use the partition to compute
+{
+	double ret = 0.0;
+	map<int, double> & locMap = QNodes_[qid].p2loc_[this->loc2partition_[UlocID]];
+	for (map<int, double>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
+		if (getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second) <= DIS_THRESHOLD) {
+			ret += i->second;
+		}
+	}
+	//cerr << ret << endl;
 	return ret;
 }
 
 double EQFG::spatialAdjustWeight(int qid, double w, double beta) 
 {
-	return beta * w + (1 - beta) * getSpatialSim(qid);
+	//return beta * w + (1 - beta) * getSpatialSim(qid);
+	return beta * w + (1 - beta) * getSpatialSim_p(qid);
 }
 
 
@@ -305,12 +327,31 @@ void EQFG::loadLocation(const string locPath)
 	}
 	loc2corIn.close();
 
+	string indexPath = locPath + "partition.txt";
+	cerr << "Starting reading " << indexPath << endl;
+	loc2partition_ = vector<pair<int, int>>(locations_.size());
+	ifstream indexIn(indexPath.c_str());
+	while (getline(indexIn, line)) {
+		vector<string> strs = split(line);
+		int locID = loc2id_[strs[2]];
+		int x = atoi(strs[0].c_str());
+		int y = atoi(strs[1].c_str());
+		pair<int, int> p = make_pair(x, y);
+		if (partition_.find(p) == partition_.end()) {
+			partition_[p] = vector<int>();
+		}
+		partition_[p].push_back(locID);
+		loc2partition_[locID] = p;
+	}
+	indexIn.close();
+
 	string query2locPath = locPath + "query2loc.txt";
 	int enum_q2l = 0;
 	cerr << "Starting reading " << query2locPath << endl;
 	ifstream query2locIn(query2locPath.c_str(), ios::in);
 	while (getline(query2locIn, line)) {
 		vector<string> strs = split(line);
+		int qid = query2id_[strs[0]];
 		map<int, double> tempMap;
 		int sum = 0;
 		for (int i = 1; i < strs.size(); i += 2) {
@@ -321,8 +362,14 @@ void EQFG::loadLocation(const string locPath)
 		for (map<int, double>::iterator i = tempMap.begin(); i != tempMap.end(); ++i) {
 			i->second /= sum;
 			enum_q2l += 1;
+			pair<int, int> p = loc2partition_[i->first];
+			if (QNodes_[qid].p2loc_.find(p) == QNodes_[qid].p2loc_.end()) {
+				QNodes_[qid].p2loc_[p] = map<int, double>();
+			}
+			QNodes_[qid].p2loc_[p][i->first] = i->second;
 		}
-		query2loc_[query2id_[strs[0]]] = tempMap;
+		query2loc_[qid] = tempMap;
+		
 	}
 	query2locIn.close();
 	cerr << "#location:" << '\t' << locations_.size() << endl;
