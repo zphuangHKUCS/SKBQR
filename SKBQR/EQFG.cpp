@@ -66,7 +66,7 @@ double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 {
 	double ret = 0.0;
 	map<int, float> & locMap = QNodes_[qid].p2loc_[this->loc2partition_[UlocID]];
-	cerr << locMap.size() << endl;
+	//cerr << locMap.size() << endl;
 	for (map<int, float>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
 		if (getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second) <= DIS_THRESHOLD) {
 			ret += i->second;
