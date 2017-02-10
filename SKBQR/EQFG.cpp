@@ -368,7 +368,8 @@ void EQFG::loadLocation(const string locPath)
 			}
 			QNodes_[qid].p2loc_[p][i->first] = i->second;
 		}
-		query2loc_[qid] = tempMap;
+		// remove the query2loc temparorily
+		//query2loc_[qid] = tempMap;
 		
 	}
 	query2locIn.close();
