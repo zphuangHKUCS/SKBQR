@@ -80,8 +80,8 @@ double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 
 double EQFG::spatialAdjustWeight(int qid, double w, double beta) 
 {
-	return beta * w + (1 - beta) * getSpatialSim(qid);
-	//return beta * w + (1 - beta) * getSpatialSim_p(qid);
+	//return beta * w + (1 - beta) * getSpatialSim(qid);
+	return beta * w + (1 - beta) * getSpatialSim_p(qid);
 }
 
 
