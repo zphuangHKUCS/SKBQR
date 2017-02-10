@@ -337,10 +337,10 @@ void EQFG::loadLocation(const string locPath)
 		int x = atoi(strs[0].c_str());
 		int y = atoi(strs[1].c_str());
 		pair<int, int> p = make_pair(x, y);
-		if (partition_.find(p) == partition_.end()) {
-			partition_[p] = vector<int>();
-		}
-		partition_[p].push_back(locID);
+		//if (partition_.find(p) == partition_.end()) {
+		//	partition_[p] = vector<int>();
+		//}
+		//partition_[p].push_back(locID);
 		loc2partition_[locID] = p;
 	}
 	indexIn.close();
@@ -397,8 +397,9 @@ void EQFG::saveToFiles(string dirPath)
     query2idOut.close();
     
     ofstream entity2idOut(dirPath + "entity2id.txt", ios::out);
-    for(int i = 0; i < entities_.size(); ++i){
-        entity2idOut << entities_[i] << '\t' << i << endl;
+    for(int i = 0; i < ENodes_.size(); ++i){
+        entity2idOut << "```" << '\t' << i << endl;
+//		entity2idOut << entities_[i] << '\t' << i << endl;
     }
     entity2idOut.close();
     
@@ -439,6 +440,8 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 	cerr << "start loading the query nodes." << endl;
 	string temps = indexPAth + "query2id.txt";
 	ifstream query2idIn(temps.c_str(), ios::in);
+	queries_.reserve(9500000);
+	QNodes_.reserve(9500000);
 	while (getline(query2idIn, line)) {
 		vector<string> strs = split(line, "\t");
 		QNodes_.push_back(EQFG_Node(queries_.size()));
@@ -449,12 +452,15 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 
 	cerr << "start loading the entity nodes." << endl;
 	temps = indexPAth + "entity2id.txt";
+	ENodes_.reserve(3500000);
+	//entities_.reserve(3500000);
 	ifstream entity2idIn(temps.c_str(), ios::in);
 	while (getline(entity2idIn, line)) {
 		vector<string> strs = split(line, "\t");
-		ENodes_.push_back(EQFG_Node(entities_.size()));
-		entity2id_[strs[0]] = entities_.size();
-		entities_.push_back(strs[0]);
+		int eid = ENodes_.size();
+		ENodes_.push_back(EQFG_Node(eid));
+		entity2id_[strs[0]] = eid;
+		//entities_.push_back(strs[0]);
 	}
 	entity2idIn.close();
 	cerr << "start loading the query2query edges." << endl;
@@ -482,7 +488,7 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 	while (getline(entity2queryIn, line)) {
 		vector<string> strs = split(line, "\t");
 		int sid = atoi(strs[0].c_str());
-		if (sid > entities_.size()) continue;
+		if (sid > ENodes_.size()) continue;
 		for (int i = 1; i + 1 < strs.size(); i += 2) {
 			double w = atof(strs[i + 1].c_str());
 			// Ignore too small weights
@@ -518,7 +524,7 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 	cerr << "end of building the graph." << endl;
 
 	cerr << "#query:" << '\t' << queries_.size() << endl;
-	cerr << "#entity:" << '\t' << entities_.size() << endl;
+	cerr << "#entity:" << '\t' << ENodes_.size() << endl;
 	cerr << "#edge_q2q:" << '\t' << enum_q2q << endl;
 	cerr << "#edge_e2q:" << '\t' << enum_e2q << endl;
 	cerr << "#edge_e2e:" << '\t' << enum_e2e << endl;
@@ -536,7 +542,7 @@ vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 	// The first PPR
 	map<int, double> eink;
 	for (int i = 0; i < QNodes_[qid].toEntityEdges_.size(); ++i) {
-		if(QNodes_[qid].toEntityEdges_[i].sid_ > entities_.size()) continue;
+		if(QNodes_[qid].toEntityEdges_[i].sid_ > ENodes_.size()) continue;
 		eink[QNodes_[qid].toEntityEdges_[i].sid_] = 1.0 / QNodes_[qid].toEntityEdges_.size();
 	}
 

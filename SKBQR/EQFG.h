@@ -82,7 +82,7 @@ public:
 
 public:
     
-	map<pair<int, int>, vector<int>> partition_;
+	//map<pair<int, int>, vector<int>> partition_;
 	vector<pair<int, int>> loc2partition_;
 
     map<string, int> query2id_;
@@ -103,7 +103,7 @@ public:
     vector<EQFG_Node> ENodes_;
     
     vector<string> queries_;
-    vector<string> entities_;
+    //vector<string> entities_;
 	//vector<string> documents_;
     
     
