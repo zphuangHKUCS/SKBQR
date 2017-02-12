@@ -91,7 +91,7 @@ double EQFG::spatialAdjustWeight(int qid, double w, double beta, vector<double> 
 			double sptialSim = getSpatialSim_p(qid);
 			spCache[qid] = sptialSim;
 		}
-		cerr << spCache[qid] << endl;
+		//cerr << spCache[qid] << endl;
 		return beta * w + (1 - beta) * spCache[qid];
 	}
 }
@@ -721,6 +721,7 @@ void EQFG::rec_QFG_fromfile(string inPath, string outPath)
 
 void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
 {
+	UlocID = loc2id_["Boston"];
 	cerr << "Start running EQFG reccommendation." << endl;
 	clock_t t1 = clock();
 	ifstream in(inPath.c_str(), ios::in);
