@@ -71,7 +71,8 @@ private:
 
 	vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
 	vector<pair<int, double>> PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
-	double spatialAdjustWeight(int qid, double w, double beta);
+	vector<pair<int, double>> PPR_BCA_lazy_cache(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
+	double spatialAdjustWeight(int qid, double w, double beta, vector<double> & spCache = vector<double>());
 	double getSpatialSim(int qid);
 	double getSpatialSim_p(int qid);
 
