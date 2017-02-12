@@ -66,7 +66,8 @@ private:
 	// New York 40.7504	-73.9963
 	// harverd 38.922558, -77.019416
 	// Boston 42.3706	-71.027
-	float Ulat = 42.3706, Ulon = -71.027;
+	
+	float Ulat, Ulon;
 	int UlocID = 5378;
 
 	vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);

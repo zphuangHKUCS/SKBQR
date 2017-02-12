@@ -654,6 +654,9 @@ vector<pair<int, double> > EQFG::rec_QFG(int qid)
 
 vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 {
+	Ulat = loc2cor_[UlocID].first;
+	Ulon = loc2cor_[UlocID].second;
+
 	// The first PPR
 	map<int, double> eink;
 	for (int i = 0; i < QNodes_[qid].toEntityEdges_.size(); ++i) {
