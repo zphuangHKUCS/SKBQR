@@ -82,13 +82,13 @@ double EQFG::spatialAdjustWeight(int qid, double w, double beta, vector<double> 
 {
 	//return beta * w + (1 - beta) * getSpatialSim(qid);
 	if (spCache.size() == 0) {
-		return beta * w + (1 - beta) * getSpatialSim(qid);
-		//return beta * w + (1 - beta) * getSpatialSim_p(qid);
+		//return beta * w + (1 - beta) * getSpatialSim(qid);
+		return beta * w + (1 - beta) * getSpatialSim_p(qid);
 	}
 	else {
 		if (spCache[qid] < 0) {
-			double sptialSim = getSpatialSim(qid);
-			//double sptialSim = getSpatialSim_p(qid);
+			//double sptialSim = getSpatialSim(qid);
+			double sptialSim = getSpatialSim_p(qid);
 			spCache[qid] = sptialSim;
 		}
 		//cerr << spCache[qid] << endl;
