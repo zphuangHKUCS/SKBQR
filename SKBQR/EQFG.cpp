@@ -147,7 +147,7 @@ vector<pair<int, double>> EQFG::PPR_BCA(vector<EQFG_Node> & nodes, map<int, doub
 		double wSum = 0.0;
 		if (edgeType == 1) {
 			for (int i = 0; i < edges.size(); ++i) {
-				double spatialWeight = spatialAdjustWeight(edges[i].eid_, edges[i].w_, beta);
+				double spatialWeight = spatialAdjustWeight(edges[i].eid_, edges[i].w_, beta, vector<double>());
 				//double spatialWeight = edges[i].w_;
 				wSum += spatialWeight;
 				weights.push_back(spatialWeight);
@@ -286,7 +286,7 @@ vector<pair<int, double>> EQFG::PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int,
 		if (edgeType == 1) {
 			for (int i = 0; i < edges.size(); ++i) {
 				t1 = clock();
-				double spatialWeight = spatialAdjustWeight(edges[i].eid_, edges[i].w_, beta);
+				double spatialWeight = spatialAdjustWeight(edges[i].eid_, edges[i].w_, beta, vector<double>());
 				t2 = clock();
 				timeforsptaial += (t2 - t1 + 0.0) / CLOCKS_PER_SEC;
 				//double spatialWeight = edges[i].w_;
