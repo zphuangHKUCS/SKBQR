@@ -34,9 +34,14 @@ int main(int argc, char** argv)
 {
 
 	loadInputPaths("paths.txt", argv);
+
+	/*
 	EQFG eqfg(qlPath);
 	eqfg.loadLocation(locDir);
-	
 	eqfg.rec_EQFG_fromfile(testPath, outPath);
+	*/
+
+	DQG dqg(qlPath);
+	dqg.loadLocation(locDir);
 	return 0;
 }
