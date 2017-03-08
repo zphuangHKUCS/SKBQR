@@ -765,7 +765,7 @@ void DQG::loadDoc(string indexPath)
 		vector<string> strs = split(line, "\t");
 		if (doc2id_.find(strs[0]) == doc2id_.end()) {
 			DNodes_.push_back(EQFG_Node(docs_.size()));
-			doc2id_[strs[0]] = queries_.size();
+			doc2id_[strs[0]] = docs_.size();
 			docs_.push_back(strs[0]);
 		}
 		int did = doc2id_[strs[0]];
