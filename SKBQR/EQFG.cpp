@@ -850,6 +850,8 @@ void DQG::loadLocation(const string locPath)
 	ifstream url2locIn(url2locPath, ios::in);
 	while (getline(url2locIn, line)) {
 		vector<string> strs = split(line);
+		if (doc2id_.find(strs[0]) == doc2id_.end())
+			continue;
 		int did = doc2id_[strs[0]];
 
 		int count = 0;
@@ -862,6 +864,9 @@ void DQG::loadLocation(const string locPath)
 			count += t;
 			lon += loc2cor_[locid].first;
 			lat += loc2cor_[locid].second;
+		}
+		if (count == 0) {
+			continue;
 		}
 		lon /= count;
 		lat /= count;
