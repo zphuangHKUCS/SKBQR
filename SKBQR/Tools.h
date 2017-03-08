@@ -2,8 +2,8 @@
 //  Tools.h
 //  EQFG
 //
-//  Created by 黄智鹏 on 16/4/10.
-//  Copyright (c) 2016年 黄智鹏. All rights reserved.
+//  Created by 黄智�?on 16/4/10.
+//  Copyright (c) 2016�?黄智�? All rights reserved.
 //
 
 

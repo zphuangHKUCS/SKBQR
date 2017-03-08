@@ -16,6 +16,7 @@
 #include <iostream>
 #include "BoundHeap.h"
 
+
 using namespace std;
 
 #define NUMOFRELATEDENTITY 10
