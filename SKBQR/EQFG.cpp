@@ -548,11 +548,11 @@ void EQFG::saveToFiles(string dirPath)
     entity2entity_w_out.close();
 }
 
-EQFG::EQFG(string indexPAth, int k): k_(k)
+void EQFG::loadQuery(string indexPath)
 {
 	string line;
 	cerr << "start loading the query nodes." << endl;
-	string temps = indexPAth + "query2id.txt";
+	string temps = indexPath + "query2id.txt";
 	ifstream query2idIn(temps.c_str(), ios::in);
 	queries_.reserve(9500000);
 	QNodes_.reserve(9500000);
@@ -564,23 +564,10 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 	}
 	query2idIn.close();
 
-	cerr << "start loading the entity nodes." << endl;
-	temps = indexPAth + "entity2id.txt";
-	ENodes_.reserve(3500000);
-	//entities_.reserve(3500000);
-	ifstream entity2idIn(temps.c_str(), ios::in);
-	while (getline(entity2idIn, line)) {
-		vector<string> strs = split(line, "\t");
-		int eid = ENodes_.size();
-		ENodes_.push_back(EQFG_Node(eid));
-		entity2id_[strs[0]] = eid;
-		//entities_.push_back(strs[0]);
-	}
-	entity2idIn.close();
 	cerr << "start loading the query2query edges." << endl;
-	string tempPath = indexPAth + "query2query_w.txt";
+	string tempPath = indexPath + "query2query_w.txt";
 	ifstream query2query_w_in(tempPath.c_str(), ios::in);
-	int enum_q2q = 0, enum_e2q = 0, enum_e2e = 0;
+	
 	while (getline(query2query_w_in, line)) {
 		vector<string> strs = split(line, "\t");
 		int sid = atoi(strs[0].c_str());
@@ -592,12 +579,29 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 				continue;
 			EQFG_Edge tempEdge(sid, eid, atof(strs[i + 1].c_str()));
 			QNodes_[sid].toQueryEdges_.push_back(tempEdge);
-			enum_q2q += 1;
 		}
 	}
 	query2idIn.close();
+}
+
+void EQFG::loadEntity(string indexPath) {
+	string line;
+	cerr << "start loading the entity nodes." << endl;
+	string temps = indexPath + "entity2id.txt";
+	ENodes_.reserve(3500000);
+	//entities_.reserve(3500000);
+	ifstream entity2idIn(temps.c_str(), ios::in);
+	while (getline(entity2idIn, line)) {
+		vector<string> strs = split(line, "\t");
+		int eid = ENodes_.size();
+		ENodes_.push_back(EQFG_Node(eid));
+		entity2id_[strs[0]] = eid;
+		//entities_.push_back(strs[0]);
+	}
+	entity2idIn.close();
+
 	cerr << "start loading the entity2query edges." << endl;
-	tempPath = indexPAth + "entity2query_w.txt";
+	string tempPath = indexPath + "entity2query_w.txt";
 	ifstream entity2queryIn(tempPath.c_str(), ios::in);
 	while (getline(entity2queryIn, line)) {
 		vector<string> strs = split(line, "\t");
@@ -606,19 +610,18 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 		for (int i = 1; i + 1 < strs.size(); i += 2) {
 			double w = atof(strs[i + 1].c_str());
 			// Ignore too small weights
-			if(w < LOAD_WEIGHT_IGNORE) 
+			if (w < LOAD_WEIGHT_IGNORE)
 				continue;
-			if(atoi(strs[i].c_str()) > queries_.size()) 
+			if (atoi(strs[i].c_str()) > queries_.size())
 				continue;
 			EQFG_Edge tempEdge(sid, atoi(strs[i].c_str()), atof(strs[i + 1].c_str()));
 			ENodes_[sid].toQueryEdges_.push_back(tempEdge);
 			QNodes_[atoi(strs[i].c_str())].toEntityEdges_.push_back(tempEdge);
-			enum_e2q += 1;
 		}
 	}
 	entity2queryIn.close();
 	cerr << "start loading the entity2entity edges" << endl;
-	tempPath = indexPAth + "entity2entity_w.txt";
+	tempPath = indexPath + "entity2entity_w.txt";
 	ifstream entity2entityIn(tempPath.c_str(), ios::in);
 	while (getline(entity2entityIn, line)) {
 		vector<string> strs = split(line, "\t");
@@ -628,20 +631,22 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 			EQFG_Edge tempEdge(sid, atoi(strs[i].c_str()), atof(strs[i + 1].c_str()));
 			sum += atof(strs[i + 1].c_str());
 			ENodes_[sid].toEntityEdges_.push_back(tempEdge);
-			enum_e2e += 1;
 		}
 		for (int i = 0; i < ENodes_[sid].toEntityEdges_.size(); i++) {
 			ENodes_[sid].toEntityEdges_[i].w_ /= sum;
 		}
 	}
 	entity2entityIn.close();
-	cerr << "end of building the graph." << endl;
+}
 
+EQFG::EQFG(string indexPAth, int k): k_(k)
+{
+	loadQuery(indexPAth);
+	loadEntity(indexPAth);
+	
+	cerr << "end of building the graph." << endl;
 	cerr << "#query:" << '\t' << queries_.size() << endl;
 	cerr << "#entity:" << '\t' << ENodes_.size() << endl;
-	cerr << "#edge_q2q:" << '\t' << enum_q2q << endl;
-	cerr << "#edge_e2q:" << '\t' << enum_e2q << endl;
-	cerr << "#edge_e2e:" << '\t' << enum_e2e << endl;
 }
 
 vector<pair<int, double> > EQFG::rec_QFG(int qid)
