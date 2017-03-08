@@ -752,3 +752,122 @@ void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
 	clock_t t2 = clock();
 	cerr << "EQFG recommendation takes " << (t2 - t1 + 0.0) / CLOCKS_PER_SEC << "seconds" << endl;
 }
+
+
+void DQG::loadDoc(string indexPath)
+{
+	string line;
+	cerr << "start loading the query2Doc edges." << endl;
+	string temps = indexPath + "doc2que_count.txt";
+	ifstream doc2idIn(temps.c_str(), ios::in);
+
+	while (getline(doc2idIn, line)) {
+		vector<string> strs = split(line, "\t");
+		if (doc2id_.find(strs[0]) == doc2id_.end()) {
+			DNodes_.push_back(EQFG_Node(docs_.size()));
+			doc2id_[strs[0]] = queries_.size();
+			docs_.push_back(strs[0]);
+		}
+		int did = doc2id_[strs[0]];
+		int qid = query2id_[strs[1]];
+		double w = atof(strs[2].c_str()) / MAXCLICK;
+		DNodes_[did].toQueryEdges_.push_back(EQFG_Edge(did, qid, w));
+		QNodes_[qid].toDocEdges_.push_back(EQFG_Edge(qid, did, w));
+	}
+	doc2idIn.close();
+}
+
+void DQG::loadQuery(string indexPath)
+{
+	string line;
+	cerr << "start loading the query nodes." << endl;
+	string temps = indexPath + "query2id.txt";
+	ifstream query2idIn(temps.c_str(), ios::in);
+	queries_.reserve(9500000);
+	QNodes_.reserve(9500000);
+	while (getline(query2idIn, line)) {
+		vector<string> strs = split(line, "\t");
+		QNodes_.push_back(EQFG_Node(queries_.size()));
+		query2id_[strs[0]] = queries_.size();
+		queries_.push_back(strs[0]);
+	}
+	query2idIn.close();
+
+	cerr << "start loading the query2query edges." << endl;
+	string tempPath = indexPath + "query2query_w.txt";
+	ifstream query2query_w_in(tempPath.c_str(), ios::in);
+
+	while (getline(query2query_w_in, line)) {
+		vector<string> strs = split(line, "\t");
+		int sid = atoi(strs[0].c_str());
+		if (queries_[sid] == "-")
+			continue;
+		for (int i = 1; i < strs.size(); i += 2) {
+			int eid = atoi(strs[i].c_str());
+			if (queries_[eid] == "-")
+				continue;
+			EQFG_Edge tempEdge(sid, eid, atof(strs[i + 1].c_str()));
+			QNodes_[sid].toQueryEdges_.push_back(tempEdge);
+		}
+	}
+	query2idIn.close();
+}
+
+DQG::DQG(string indexPAth, int k) : k_(k)
+{
+	loadQuery(indexPAth);
+	loadDoc(indexPAth);
+
+	cerr << "end of building the graph." << endl;
+	cerr << "#query:" << '\t' << queries_.size() << endl;
+	cerr << "#doc  :" << '\t' << docs_.size() << endl;
+}
+
+void DQG::loadLocation(const string locPath)
+{
+	map<string, int> loc2id_;
+	vector< pair<double, double> > loc2cor_;
+	vector<string> locations_;
+
+	string loc2corPath = locPath + "loc2cor";
+	ifstream loc2corIn(loc2corPath.c_str(), ios::in);
+	string line;
+	cerr << "Starting reading " << loc2corPath << endl;
+	while (getline(loc2corIn, line)) {
+		vector<string> strs = split(line);
+		if (strs.size() != 3)
+			continue;
+		loc2id_[strs[0]] = locations_.size();
+		loc2cor_.push_back(make_pair(atof(strs[1].c_str()), atof(strs[2].c_str())));
+		locations_.push_back(strs[0]);
+	}
+	loc2corIn.close();
+
+	doc2cor_ = vector< pair<float, float>>(docs_.size(), make_pair(float(0.0), float(0.0)));
+	string url2locPath = locPath + "url2loc";
+	cerr << "Starting reading " << url2locPath << endl;
+
+	ifstream url2locIn(url2locPath, ios::in);
+	while (getline(url2locIn, line)) {
+		vector<string> strs = split(line);
+		int did = doc2id_[strs[0]];
+
+		int count = 0;
+		double lon = 0.0;
+		double lat = 0.0;
+
+		for (int i = 0; i < strs.size(); i += 2) {
+			int locid = loc2id_[strs[i]];
+			int t = atoi(strs[i + 1].c_str());
+			count += t;
+			lon += loc2cor_[locid].first;
+			lat += loc2cor_[locid].second;
+		}
+		lon /= count;
+		lat /= count;
+		doc2cor_[did] = make_pair(lon, lat);
+	}
+	url2locIn.close();
+
+	cerr << "End loading location!" << endl;
+}

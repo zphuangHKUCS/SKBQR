@@ -32,6 +32,8 @@ using namespace std;
 #define DIS_THRESHOLD 10000 // range equals 10km
 //#define PRO_THRESHOLD 0.1   // the probability that falling within the range no less than 0.1
 
+#define MAXCLICK 257402
+
 
 class EQFG_Edge
 {
@@ -49,6 +51,7 @@ public:
     vector<EQFG_Edge> toQueryEdges_; // outedges
     //vector<EQFG_Edge> inQueryEdges_; // inedges
     vector<EQFG_Edge> toEntityEdges_;
+	vector<EQFG_Edge> toDocEdges_;
 	map<pair<int, int>, map<int, float>> p2loc_;
 	
 	EQFG_Node(int id);
@@ -124,5 +127,27 @@ public:
 
 };
 
+class DQG
+{
+private:
+	int k_;
 
+
+	void loadQuery(string indexPath);
+	void loadDoc(string indexPath);
+public:
+	map<string, int> query2id_;
+	vector<EQFG_Node> QNodes_;
+	vector<string> queries_;
+
+	map<string, int> doc2id_;
+	vector<EQFG_Node> DNodes_;
+	vector<string> docs_;
+	vector< pair<float, float>> doc2cor_;
+
+
+	DQG(string indexPath, int k = 5);
+	void loadLocation(const string locDir);
+
+};
 #endif /* defined(__EQFG__EQFG__) */
