@@ -792,25 +792,6 @@ void DQG::loadQuery(string indexPath)
 		queries_.push_back(strs[0]);
 	}
 	query2idIn.close();
-
-	cerr << "start loading the query2query edges." << endl;
-	string tempPath = indexPath + "query2query_w.txt";
-	ifstream query2query_w_in(tempPath.c_str(), ios::in);
-
-	while (getline(query2query_w_in, line)) {
-		vector<string> strs = split(line, "\t");
-		int sid = atoi(strs[0].c_str());
-		if (queries_[sid] == "-")
-			continue;
-		for (int i = 1; i < strs.size(); i += 2) {
-			int eid = atoi(strs[i].c_str());
-			if (queries_[eid] == "-")
-				continue;
-			EQFG_Edge tempEdge(sid, eid, atof(strs[i + 1].c_str()));
-			QNodes_[sid].toQueryEdges_.push_back(tempEdge);
-		}
-	}
-	query2idIn.close();
 }
 
 DQG::DQG(string indexPAth, int k) : k_(k)
