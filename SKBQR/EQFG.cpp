@@ -858,7 +858,7 @@ void DQG::loadLocation(const string locPath)
 		double lon = 0.0;
 		double lat = 0.0;
 
-		for (int i = 0; i < strs.size(); i += 2) {
+		for (int i = 1; i < strs.size(); i += 2) {
 			int locid = loc2id_[strs[i]];
 			int t = atoi(strs[i + 1].c_str());
 			count += t;
