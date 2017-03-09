@@ -117,7 +117,7 @@ public:
 	//vector<string> documents_;
     
     
-	EQFG(string indexPath, int k = 5);
+	EQFG(string indexPath, int k = 25);
  
     void saveToFiles(string dirPath);
 
@@ -149,7 +149,7 @@ public:
 	vector< pair<float, float>> doc2cor_;
 
 
-	DQG(string indexPath, int k = 5);
+	DQG(string indexPath, int k = 25);
 	void loadLocation(const string locDir);
 
 	void rec_DQG_fromfile(string inputPath, string outPath);

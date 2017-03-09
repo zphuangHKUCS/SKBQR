@@ -741,6 +741,9 @@ void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
 			vector<pair<int, double> > ret = rec_EQFG(qid);
 			out << query;
 			for (int i = 0; i < ret.size(); ++i) {
+				if (queries_[ret[i].first] == query) {
+					continue;
+				}
 				out << '\t' << queries_[ret[i].first] << '\t' << ret[i].second;
 			}
 			out << endl;
@@ -879,6 +882,9 @@ void DQG::rec_DQG_fromfile(string inPath, string outPath)
 			vector<pair<int, double> > ret = rec_DQG(qid);
 			out << que;
 			for (int i = 0; i < ret.size(); ++i) {
+				if (queries_[ret[i].first] == que) {
+					continue;
+				}
 				out << '\t' << queries_[ret[i].first] << '\t' << ret[i].second;
 			}
 			out << endl;
