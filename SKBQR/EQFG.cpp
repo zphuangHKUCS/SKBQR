@@ -739,7 +739,7 @@ void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
 		if (query2id_.find(query) != query2id_.end()) {
 			int qid = query2id_[query];
 			vector<pair<int, double> > ret = rec_EQFG(qid);
-			out << line;
+			out << query;
 			for (int i = 0; i < ret.size(); ++i) {
 				out << '\t' << queries_[ret[i].first] << '\t' << ret[i].second;
 			}
@@ -877,7 +877,7 @@ void DQG::rec_DQG_fromfile(string inPath, string outPath)
 		if (query2id_.find(que) != query2id_.end()) {
 			int qid = query2id_[que];
 			vector<pair<int, double> > ret = rec_DQG(qid);
-			out << line;
+			out << que;
 			for (int i = 0; i < ret.size(); ++i) {
 				out << '\t' << queries_[ret[i].first] << '\t' << ret[i].second;
 			}
