@@ -51,5 +51,6 @@ int main(int argc, char** argv)
 	     // TQG
 	EQFG eqfg(qlPath);
 	eqfg.loadTerm(qlPath);
+	eqfg.rec_TQG_fromfile(testPath, outPath);
 	return 0;
 }

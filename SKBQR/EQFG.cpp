@@ -319,7 +319,7 @@ vector<pair<int, double>> EQFG::PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int,
 	}
 	t4 = clock();
 	if (edgeType == 1) {
-		cerr << "                     EQFG takes:\t" << (t4 - t3 + 0.0) / CLOCKS_PER_SEC << " seconds" << endl;
+		cerr << "                      PPR takes:\t" << (t4 - t3 + 0.0) / CLOCKS_PER_SEC << " seconds" << endl;
 		cerr << "sptaial adjusting weights takes:\t" << timeforsptaial << " seconds" << endl;
 	}
 	
@@ -733,6 +733,17 @@ vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 	return PPR_BCA_lazy_cache(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, k_, 1);
 }
 
+vector<pair<int, double> > EQFG::rec_TQG(int tid)
+{
+	Ulat = loc2cor_[UlocID].first;
+	Ulon = loc2cor_[UlocID].second;
+	map<int, double> qink;
+	for (int i = 0; i < TNodes_[tid].toQueryEdges_.size(); ++i) {
+		qink[TNodes_[tid].toQueryEdges_[i].eid_] = TNodes_[tid].toQueryEdges_[i].w_;
+	}
+	return PPR_BCA_lazy(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, 10 * k_, 1); // return more than k, so we can choose
+}
+
 void EQFG::rec_QFG_fromfile(string inPath, string outPath)
 {
 	cerr << "Start running QFG reccommendation." << endl;
@@ -776,6 +787,75 @@ void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
 		if (query2id_.find(query) != query2id_.end()) {
 			int qid = query2id_[query];
 			vector<pair<int, double> > ret = rec_EQFG(qid);
+			out << query;
+			for (int i = 0; i < ret.size(); ++i) {
+				if (queries_[ret[i].first] == query) {
+					continue;
+				}
+				out << '\t' << queries_[ret[i].first] << '\t' << ret[i].second;
+			}
+			out << endl;
+		}
+		else {
+			out << query << endl;
+		}
+	}
+	in.close();
+	out.close();
+	clock_t t2 = clock();
+	cerr << "EQFG recommendation takes " << (t2 - t1 + 0.0) / CLOCKS_PER_SEC << "seconds" << endl;
+}
+
+void EQFG::rec_TQG_fromfile(string inPath, string outPath)
+{
+	UlocID = loc2id_["New York"];
+	cerr << "Start running TQG reccommendation." << endl;
+	clock_t t1 = clock();
+	ifstream in(inPath.c_str(), ios::in);
+	ofstream out(outPath.c_str(), ios::out);
+	string line;
+	while (getline(in, line)) {
+		cerr << line << endl;
+		vector<string> strs = split(line);
+		string query = strs[1];
+		vector<string> terms = split(query, " ");
+		map <int, double> result;
+		bool firstTime = true;
+		for (int i = 0; i < terms.size(); ++i) {
+			if (term2id_.find(terms[i]) == term2id_.end()) {
+				continue;
+			}
+			int tid = term2id_[terms[i]];
+			vector<pair<int, double>> tempResult = rec_TQG(tid);
+			if (firstTime) {
+				firstTime = false;
+				for (int j = 0; j < tempResult.size(); ++j) {
+					result[tempResult[j].first] = tempResult[j].second;
+				}
+			}
+			else {
+				for (int j = 0; j < tempResult.size(); ++j) {
+					if (result.find(tempResult[j].first) != result.end()) {
+						result[tempResult[j].first] *= tempResult[j].second;
+					}
+				}
+			}
+		}
+		BoundHeap topk(k_);
+		for (map<int, double>::iterator i = result.begin(); i != result.end(); ++i) {
+			topk.push(make_pair(i->first, -i->second));
+		}
+		vector<pair<int, double> > reverseRet, ret;
+		while (topk.size() > 0) {
+			pair<int, double> item = topk.pop();
+			reverseRet.push_back(make_pair(item.first, -item.second));
+		}
+		for (int i = 0; i < reverseRet.size(); ++i) {
+			ret.push_back(reverseRet[reverseRet.size() - 1 - i]);
+		}
+		
+		if (ret.size() > 0) {
+			
 			out << query;
 			for (int i = 0; i < ret.size(); ++i) {
 				if (queries_[ret[i].first] == query) {

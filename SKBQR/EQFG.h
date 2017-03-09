@@ -88,6 +88,8 @@ public:
 	int k_;
 	vector<pair<int, double> > rec_QFG(int qid);
 	vector<pair<int, double> > rec_EQFG(int qid);
+	vector<pair<int, double> > rec_TQG(int tid);
+
 
 public:
     
@@ -124,6 +126,7 @@ public:
 
 	void rec_QFG_fromfile(string inputPath, string outPath);
 	void rec_EQFG_fromfile(string inputPath, string outPath);
+	void rec_TQG_fromfile(string inputPath, string outPath);
 
 	void loadLocation(const string locDir);
 	void loadTerm(const string queryDir);
