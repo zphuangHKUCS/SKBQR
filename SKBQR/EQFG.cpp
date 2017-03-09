@@ -892,6 +892,7 @@ void DQG::rec_DQG_fromfile(string inPath, string outPath)
 vector<pair<int, double> > DQG::rec_DQG(int qid)
 {
 	map<int, double> ink;
+	ink.clear();
 	ink[qid] = 1.0;
 	return PPR_BCA(ink, EQFG_PPR_QUERY_ALPHA, 0.5, k_);
 }
@@ -961,10 +962,11 @@ vector<pair<int, double>> DQG::PPR_BCA(map<int, double> & initialInk, double alp
 				double addInk = distributedInk * weights[i];
 
 				// lazy update
-				inkBuffer[edges[i].eid_] += addInk;
-				if (inkBuffer[edges[i].eid_] >= PPR_IGNORE_INK) {
-					heap.push(make_pair(edges[i].eid_, inkBuffer[edges[i].eid_]));
-					inkBuffer[edges[i].eid_] = 0.0;
+				int tempQid = edges[i].eid_;
+				inkBuffer[tempQid] += addInk;
+				if (inkBuffer[tempQid] >= PPR_IGNORE_INK) {
+					heap.push(make_pair(tempQid, inkBuffer[tempQid]));
+					inkBuffer[tempQid] = 0.0;
 				}
 			}
 		}
@@ -973,12 +975,12 @@ vector<pair<int, double>> DQG::PPR_BCA(map<int, double> & initialInk, double alp
 			double increaseInk = topItem.second * alpha;
 			activeInk -= topItem.second * alpha;
 			if (result.find(qid) == result.end()) {
-				result[topItem.first] = 0.0;
+				result[qid] = 0.0;
 			}
-			result[topItem.first] += increaseInk;
+			result[qid] += increaseInk;
 			activeInk -= increaseInk;
 			double distributedInk = (1.0 - alpha) * topItem.second;
-			vector<EQFG_Edge> & edges = QNodes_[topItem.first].toDocEdges_;
+			vector<EQFG_Edge> & edges = QNodes_[qid].toDocEdges_;
 			vector<double> weights;
 			double wSum = 0.0;
 			for (int i = 0; i < edges.size(); ++i) {
