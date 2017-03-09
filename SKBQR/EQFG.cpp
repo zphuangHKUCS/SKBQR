@@ -746,7 +746,7 @@ void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
 			out << endl;
 		}
 		else {
-			out << line << endl;
+			out << query << endl;
 		}
 	}
 	in.close();
@@ -884,7 +884,7 @@ void DQG::rec_DQG_fromfile(string inPath, string outPath)
 			out << endl;
 		}
 		else {
-			out << line << endl;
+			out << que << endl;
 		}
 	}
 	in.close();
