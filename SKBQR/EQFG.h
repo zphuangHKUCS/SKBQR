@@ -75,8 +75,7 @@ private:
 	//int UlocID = 5378;  // boston
 	int UlocID; // new york
 
-	void loadQuery(string indexPath);
-	void loadEntity(string indexPath);
+	
 
 	vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
 	vector<pair<int, double>> PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
@@ -97,6 +96,7 @@ public:
 
     map<string, int> query2id_;
     map<string, int> entity2id_;
+	map<string, int> term2id_;
 
 	map<string, int> loc2id_;
 	vector< pair<float, float> > loc2cor_;
@@ -111,6 +111,7 @@ public:
 	
     vector<EQFG_Node> QNodes_;
     vector<EQFG_Node> ENodes_;
+	vector<EQFG_Node> TNodes_;
     
     vector<string> queries_;
     //vector<string> entities_;
@@ -123,8 +124,11 @@ public:
 
 	void rec_QFG_fromfile(string inputPath, string outPath);
 	void rec_EQFG_fromfile(string inputPath, string outPath);
-	void loadLocation(const string locDir);
 
+	void loadLocation(const string locDir);
+	void loadTerm(const string queryDir);
+	void loadQuery(string indexPath);
+	void loadEntity(string indexPath);
 };
 
 class DQG

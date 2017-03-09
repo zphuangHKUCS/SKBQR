@@ -35,14 +35,21 @@ int main(int argc, char** argv)
 
 	loadInputPaths("paths.txt", argv);
 
-	/*
+	/*    // EQFG
 	EQFG eqfg(qlPath);
+	eqfg.loadEntity(qlPath);
 	eqfg.loadLocation(locDir);
 	eqfg.rec_EQFG_fromfile(testPath, outPath);
 	*/
 
+	/*   //  DQG
 	DQG dqg(qlPath);
 	dqg.loadLocation(locDir);
 	dqg.rec_DQG_fromfile(testPath, outPath);
+	*/
+	
+	     // TQG
+	EQFG eqfg(qlPath);
+	eqfg.loadTerm(qlPath);
 	return 0;
 }

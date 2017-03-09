@@ -639,14 +639,51 @@ void EQFG::loadEntity(string indexPath) {
 	entity2entityIn.close();
 }
 
+void EQFG::loadTerm(string indexPath) {
+	string line;
+	cerr << "start loading the term nodes." << endl;
+	string temps = indexPath + "term2id.txt";
+	TNodes_.reserve(3000000);
+	ifstream term2idIn(temps.c_str(), ios::in);
+	while (getline(term2idIn, line)) {
+		vector<string> strs = split(line, "\t");
+		int tid = TNodes_.size();
+		TNodes_.push_back(EQFG_Node(tid));
+		term2id_[strs[0]] = tid;
+	}
+	term2idIn.close();
+
+	cerr << "start loading the term2query edges." << endl;
+	string tempPath = indexPath + "term2query_w.txt";
+	ifstream term2queryIn(tempPath.c_str(), ios::in);
+	int edgecount = 0;
+	while (getline(term2queryIn, line)) {
+		vector<string> strs = split(line, "\t");
+		int sid = atoi(strs[0].c_str());
+		if (sid > TNodes_.size()) continue;
+		for (int i = 1; i + 1 < strs.size(); i += 2) {
+			double w = atof(strs[i + 1].c_str());
+			// Ignore too small weights
+			if (w < LOAD_WEIGHT_IGNORE)
+				continue;
+			if (atoi(strs[i].c_str()) > TNodes_.size())
+				continue;
+			++edgecount;
+			EQFG_Edge tempEdge(sid, atoi(strs[i].c_str()), atof(strs[i + 1].c_str()));
+			TNodes_[sid].toQueryEdges_.push_back(tempEdge);
+		}
+	}
+	term2queryIn.close();
+	cerr << "#terms            " << '\t' << TNodes_.size() << endl;
+	cerr << "#term2query edges " << '\t' << edgecount << endl;
+}
+
 EQFG::EQFG(string indexPAth, int k): k_(k)
 {
 	loadQuery(indexPAth);
-	loadEntity(indexPAth);
-	
+	//loadEntity(indexPAth);
 	cerr << "end of building the graph." << endl;
 	cerr << "#query:" << '\t' << queries_.size() << endl;
-	cerr << "#entity:" << '\t' << ENodes_.size() << endl;
 }
 
 vector<pair<int, double> > EQFG::rec_QFG(int qid)
