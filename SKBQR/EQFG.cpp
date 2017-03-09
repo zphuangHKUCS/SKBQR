@@ -828,6 +828,7 @@ void EQFG::rec_TQG_fromfile(string inPath, string outPath)
 			}
 			int tid = term2id_[terms[i]];
 			vector<pair<int, double>> tempResult = rec_TQG(tid);
+			cerr << "Finish rec_TQG for " << terms[i] << endl;
 			if (firstTime) {
 				firstTime = false;
 				for (int j = 0; j < tempResult.size(); ++j) {
