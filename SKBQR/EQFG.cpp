@@ -809,7 +809,7 @@ void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
 
 void EQFG::rec_TQG_fromfile(string inPath, string outPath)
 {
-	UlocID = loc2id_["New York"];
+	UlocID = loc2id_["New york"];
 	cerr << "Start running TQG reccommendation." << endl;
 	clock_t t1 = clock();
 	ifstream in(inPath.c_str(), ios::in);
