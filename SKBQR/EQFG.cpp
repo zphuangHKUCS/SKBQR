@@ -869,7 +869,7 @@ void DQG::rec_DQG_fromfile(string inPath, string outPath)
 	ofstream out(outPath.c_str(), ios::out);
 	string line;
 	while (getline(in, line)) {
-		//cerr << line << endl;
+		cerr << line << endl;
 		if (query2id_.find(line) != query2id_.end()) {
 			int qid = query2id_[line];
 			vector<pair<int, double> > ret = rec_DQG(qid);
@@ -929,6 +929,8 @@ vector<pair<int, double>> DQG::PPR_BCA(map<int, double> & initialInk, double alp
 	double activeInk = 0.0;
 	map<int, double> result;
 
+	vector<double> inkBuffer(QNodes_.size() + DNodes_.size(), 0.0);
+
 	// initialize the heap
 	for (map<int, double>::iterator i = initialInk.begin(); i != initialInk.end(); ++i) {
 		heap.push(*i);
@@ -957,7 +959,13 @@ vector<pair<int, double>> DQG::PPR_BCA(map<int, double> & initialInk, double alp
 			}
 			for (int i = 0; i < edges.size(); ++i) {
 				double addInk = distributedInk * weights[i];
-				heap.push(make_pair(edges[i].eid_ + QNodes_.size(), addInk)); // the first QNodes.size() are query nodes, all the rest are doc nodes
+
+				// lazy update
+				inkBuffer[edges[i].eid_] += addInk;
+				if (inkBuffer[edges[i].eid_] >= PPR_IGNORE_INK) {
+					heap.push(make_pair(edges[i].eid_, inkBuffer[edges[i].eid_]));
+					inkBuffer[edges[i].eid_] = 0.0;
+				}
 			}
 		}
 		else { // it is a query
@@ -983,10 +991,19 @@ vector<pair<int, double>> DQG::PPR_BCA(map<int, double> & initialInk, double alp
 			}
 			for (int i = 0; i < edges.size(); ++i) {
 				double addInk = distributedInk * weights[i];
-				heap.push(make_pair(edges[i].eid_ + QNodes_.size(), addInk)); // the first QNodes.size() are query nodes, all the rest are doc nodes
+				
+				// lazy update
+				int tempdid = edges[i].eid_ + QNodes_.size();
+				inkBuffer[tempdid] += addInk;
+				if (inkBuffer[tempdid] >= PPR_IGNORE_INK) {
+					heap.push(make_pair(tempdid, inkBuffer[tempdid]));
+					inkBuffer[tempdid] = 0.0;
+				}
+				// the first QNodes.size() are query nodes, all the rest are doc nodes
+				
+				//heap.push(make_pair(edges[i].eid_ + QNodes_.size(), addInk)); // the first QNodes.size() are query nodes, all the rest are doc nodes
 			}
 		}
-	
 	}
 	// find the result
 	BoundHeap topk(k);

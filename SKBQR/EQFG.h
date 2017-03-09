@@ -22,8 +22,8 @@ using namespace std;
 #define NUMOFRELATEDENTITY 10
 #define GAMMA 0.5
 
-#define EQFG_PPR_ENTITY_ALPHA 0.15
-#define EQFG_PPR_QUERY_ALPHA 0.15
+#define EQFG_PPR_ENTITY_ALPHA 0.5
+#define EQFG_PPR_QUERY_ALPHA 0.5
 
 #define PPR_EPS 0.001
 #define PPR_IGNORE_INK 0.001
