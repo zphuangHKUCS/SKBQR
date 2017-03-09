@@ -130,11 +130,14 @@ public:
 class DQG
 {
 private:
+	float Ulat, Ulon;
 	int k_;
-
-
+	double query2docWeight(int qid, int did, double w, double beta);
+	double doc2queryWeight(int did, int qid, double w, double beta);
 	void loadQuery(string indexPath);
 	void loadDoc(string indexPath);
+	vector<pair<int, double>> PPR_BCA(map<int, double> & initialInk, double alpha, double beta, int k);
+	vector<pair<int, double> > rec_DQG(int qid);
 public:
 	map<string, int> query2id_;
 	vector<EQFG_Node> QNodes_;
@@ -149,5 +152,6 @@ public:
 	DQG(string indexPath, int k = 5);
 	void loadLocation(const string locDir);
 
+	void rec_DQG_fromfile(string inputPath, string outPath);
 };
 #endif /* defined(__EQFG__EQFG__) */

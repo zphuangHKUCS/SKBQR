@@ -43,5 +43,6 @@ int main(int argc, char** argv)
 
 	DQG dqg(qlPath);
 	dqg.loadLocation(locDir);
+	dqg.rec_DQG_fromfile(testPath, outPath);
 	return 0;
 }

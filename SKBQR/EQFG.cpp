@@ -857,3 +857,149 @@ void DQG::loadLocation(const string locPath)
 
 	cerr << "End loading location!" << endl;
 }
+
+void DQG::rec_DQG_fromfile(string inPath, string outPath)
+{
+	//40.7128° N, 74.0059° W new york
+	Ulat = 40.7128;
+	Ulon = 74.0059;
+	cerr << "Start running DQG reccommendation." << endl;
+	clock_t t1 = clock();
+	ifstream in(inPath.c_str(), ios::in);
+	ofstream out(outPath.c_str(), ios::out);
+	string line;
+	while (getline(in, line)) {
+		//cerr << line << endl;
+		if (query2id_.find(line) != query2id_.end()) {
+			int qid = query2id_[line];
+			vector<pair<int, double> > ret = rec_DQG(qid);
+			out << line;
+			for (int i = 0; i < ret.size(); ++i) {
+				out << '\t' << queries_[ret[i].first] << '\t' << ret[i].second;
+			}
+			out << endl;
+		}
+		else {
+			out << line << endl;
+		}
+	}
+	in.close();
+	out.close();
+	clock_t t2 = clock();
+	cerr << "DQG recommendation takes " << (t2 - t1 + 0.0) / CLOCKS_PER_SEC << "seconds" << endl;
+}
+
+vector<pair<int, double> > DQG::rec_DQG(int qid)
+{
+	map<int, double> ink;
+	ink[qid] = 1.0;
+	return PPR_BCA(ink, EQFG_PPR_QUERY_ALPHA, 0.5, k_);
+}
+
+double DQG::query2docWeight(int qid, int did, double w, double beta)
+{
+	double lat = doc2cor_[did].first;
+	double lon = doc2cor_[did].second;
+	double dis = sqrt(pow(lat - Ulat, 2.0) + pow(lon - Ulon, 2.0));
+	dis /= 180;
+	if (dis > 1.0)
+		dis = 1.0;
+	return beta * w + (1 - beta) * (1.0 - dis);
+}
+double DQG::doc2queryWeight(int did, int qid, double w, double beta)
+{
+	double mindist = 999999;
+	for (int i = 0; i < QNodes_[qid].toDocEdges_.size(); ++i) {
+		int tempdid = QNodes_[qid].toDocEdges_[i].eid_;
+		double lat = doc2cor_[tempdid].first;
+		double lon = doc2cor_[tempdid].second;
+		double dis = sqrt(pow(lat - Ulat, 2.0) + pow(lon - Ulon, 2.0));
+		dis /= 180;
+		if (dis > 1.0)
+			dis = 1.0;
+		if (dis < mindist)
+			mindist = dis;
+	}
+	return beta * w + (1 - beta) * (1.0 - mindist);
+}
+
+vector<pair<int, double>> DQG::PPR_BCA(map<int, double> & initialInk, double alpha, double beta, int k)
+{
+	BoundHeap heap(QNodes_.size() + DNodes_.size());
+	double activeInk = 0.0;
+	map<int, double> result;
+
+	// initialize the heap
+	for (map<int, double>::iterator i = initialInk.begin(); i != initialInk.end(); ++i) {
+		heap.push(*i);
+		activeInk += i->second;
+	}
+
+	while (heap.size() > 0) { //&& activeInk > PPR_EPS) {
+		pair<int, double> topItem = heap.pop();
+		if (topItem.second < PPR_IGNORE_INK) {
+			break;
+		}
+		if (topItem.first >= QNodes_.size()) { // it is a doc
+			int did = topItem.first - QNodes_.size();
+			activeInk -= topItem.second * alpha;
+			double distributedInk = (1.0 - alpha) * topItem.second;
+			vector<EQFG_Edge> & edges = DNodes_[did].toQueryEdges_;
+			vector<double> weights;
+			double wSum = 0.0;
+			for (int i = 0; i < edges.size(); ++i) {
+				double spatialWeight = doc2queryWeight(did, edges[i].eid_, edges[i].w_, beta);
+				wSum += spatialWeight;
+				weights.push_back(spatialWeight);
+			}
+			for (int i = 0; i < edges.size(); ++i) {
+				weights[i] /= wSum;
+			}
+			for (int i = 0; i < edges.size(); ++i) {
+				double addInk = distributedInk * weights[i];
+				heap.push(make_pair(edges[i].eid_ + QNodes_.size(), addInk)); // the first QNodes.size() are query nodes, all the rest are doc nodes
+			}
+		}
+		else { // it is a query
+			int qid = topItem.first;
+			double increaseInk = topItem.second * alpha;
+			activeInk -= topItem.second * alpha;
+			if (result.find(qid) == result.end()) {
+				result[topItem.first] = 0.0;
+			}
+			result[topItem.first] += increaseInk;
+			activeInk -= increaseInk;
+			double distributedInk = (1.0 - alpha) * topItem.second;
+			vector<EQFG_Edge> & edges = QNodes_[topItem.first].toDocEdges_;
+			vector<double> weights;
+			double wSum = 0.0;
+			for (int i = 0; i < edges.size(); ++i) {
+				double spatialWeight = query2docWeight(qid, edges[i].eid_, edges[i].w_, beta);
+				wSum += spatialWeight;
+				weights.push_back(spatialWeight);
+			}
+			for (int i = 0; i < edges.size(); ++i) {
+				weights[i] /= wSum;
+			}
+			for (int i = 0; i < edges.size(); ++i) {
+				double addInk = distributedInk * weights[i];
+				heap.push(make_pair(edges[i].eid_ + QNodes_.size(), addInk)); // the first QNodes.size() are query nodes, all the rest are doc nodes
+			}
+		}
+	
+	}
+	// find the result
+	BoundHeap topk(k);
+	for (map<int, double>::iterator i = result.begin(); i != result.end(); ++i) {
+		topk.push(make_pair(i->first, -i->second));
+	}
+	vector<pair<int, double> > reverseRet, ret;
+	while (topk.size() > 0) {
+		pair<int, double> item = topk.pop();
+		reverseRet.push_back(make_pair(item.first, -item.second));
+	}
+	for (int i = 0; i < reverseRet.size(); ++i) {
+		ret.push_back(reverseRet[reverseRet.size() - 1 - i]);
+	}
+	return ret;
+}
