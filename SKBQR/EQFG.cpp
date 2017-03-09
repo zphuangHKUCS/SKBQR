@@ -741,7 +741,7 @@ vector<pair<int, double> > EQFG::rec_TQG(int tid)
 	for (int i = 0; i < TNodes_[tid].toQueryEdges_.size(); ++i) {
 		qink[TNodes_[tid].toQueryEdges_[i].eid_] = TNodes_[tid].toQueryEdges_[i].w_;
 	}
-	return PPR_BCA_lazy(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, 2 * k_, 1); // return more than k, so we can choose
+	return PPR_BCA_lazy_cache(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, 2 * k_, 1); // return more than k, so we can choose
 }
 
 void EQFG::rec_QFG_fromfile(string inPath, string outPath)
@@ -836,14 +836,13 @@ void EQFG::rec_TQG_fromfile(string inPath, string outPath)
 				}
 			}
 			else {
+				map<int, double> temptemp;
 				for (int j = 0; j < tempResult.size(); ++j) {
 					if (result.find(tempResult[j].first) != result.end()) {
-						result[tempResult[j].first] *= tempResult[j].second;
-					}
-					else {
-						result.erase(tempResult[j].first);
+						temptemp[tempResult[j].first] = result[tempResult[j].first] * tempResult[j].second;
 					}
 				}
+				result = temptemp;
 			}
 		}
 		BoundHeap topk(k_);
