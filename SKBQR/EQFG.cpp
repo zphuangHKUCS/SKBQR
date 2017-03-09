@@ -62,6 +62,7 @@ double EQFG::getSpatialSim(int qid) // the user's location is stored in a global
 			}
 		}
 	}
+	cerr << "spatial sim is: " << ret << endl;
 	return ret;
 }
 double EQFG::getSpatialSim_p(int qid) // use the partition to compute
@@ -74,7 +75,7 @@ double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 			ret += i->second;
 		}
 	}
-	//cerr << ret << endl;
+	cerr << "spatial sim is: " << ret << endl;
 	return ret;
 }
 
@@ -82,13 +83,13 @@ double EQFG::spatialAdjustWeight(int qid, double w, double beta, vector<double> 
 {
 	//return beta * w + (1 - beta) * getSpatialSim(qid);
 	if (spCache.size() == 0) {
-		//return beta * w + (1 - beta) * getSpatialSim(qid);
-		return beta * w + (1 - beta) * getSpatialSim_p(qid);
+		return beta * w + (1 - beta) * getSpatialSim(qid);
+		//return beta * w + (1 - beta) * getSpatialSim_p(qid);
 	}
 	else {
 		if (spCache[qid] < 0) {
-			//double sptialSim = getSpatialSim(qid);
-			double sptialSim = getSpatialSim_p(qid);
+			double sptialSim = getSpatialSim(qid);
+			//double sptialSim = getSpatialSim_p(qid);
 			spCache[qid] = sptialSim;
 		}
 		//cerr << spCache[qid] << endl;
