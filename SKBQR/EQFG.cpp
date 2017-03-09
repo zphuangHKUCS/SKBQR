@@ -726,7 +726,7 @@ void EQFG::rec_QFG_fromfile(string inPath, string outPath)
 
 void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
 {
-	UlocID = loc2id_["Boston"];
+	UlocID = loc2id_["New York"];
 	cerr << "Start running EQFG reccommendation." << endl;
 	clock_t t1 = clock();
 	ifstream in(inPath.c_str(), ios::in);
@@ -734,8 +734,10 @@ void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
 	string line;
 	while (getline(in, line)) {
 		cerr << line << endl;
-		if (query2id_.find(line) != query2id_.end()) {
-			int qid = query2id_[line];
+		vector<string> strs = split(line);
+		string query = strs[1];
+		if (query2id_.find(query) != query2id_.end()) {
+			int qid = query2id_[query];
 			vector<pair<int, double> > ret = rec_EQFG(qid);
 			out << line;
 			for (int i = 0; i < ret.size(); ++i) {
@@ -870,8 +872,10 @@ void DQG::rec_DQG_fromfile(string inPath, string outPath)
 	string line;
 	while (getline(in, line)) {
 		cerr << line << endl;
-		if (query2id_.find(line) != query2id_.end()) {
-			int qid = query2id_[line];
+		vector<string> strs = split(line);
+		string que = strs[1];
+		if (query2id_.find(que) != query2id_.end()) {
+			int qid = query2id_[que];
 			vector<pair<int, double> > ret = rec_DQG(qid);
 			out << line;
 			for (int i = 0; i < ret.size(); ++i) {
