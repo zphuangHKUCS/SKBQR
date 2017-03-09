@@ -822,6 +822,7 @@ void EQFG::rec_TQG_fromfile(string inPath, string outPath)
 		map <int, double> result;
 		bool firstTime = true;
 		for (int i = 0; i < terms.size(); ++i) {
+			cerr << terms[i] << endl;
 			if (term2id_.find(terms[i]) == term2id_.end()) {
 				continue;
 			}
@@ -837,6 +838,9 @@ void EQFG::rec_TQG_fromfile(string inPath, string outPath)
 				for (int j = 0; j < tempResult.size(); ++j) {
 					if (result.find(tempResult[j].first) != result.end()) {
 						result[tempResult[j].first] *= tempResult[j].second;
+					}
+					else {
+						result.erase(tempResult[j].first);
 					}
 				}
 			}
