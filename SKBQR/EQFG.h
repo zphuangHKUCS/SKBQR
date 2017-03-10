@@ -22,14 +22,14 @@ using namespace std;
 #define NUMOFRELATEDENTITY 10
 #define GAMMA 0.5
 
-#define EQFG_PPR_ENTITY_ALPHA 0.5
-#define EQFG_PPR_QUERY_ALPHA 0.5
+#define EQFG_PPR_ENTITY_ALPHA 0.3
+#define EQFG_PPR_QUERY_ALPHA 0.3
 
 #define PPR_EPS 0.001
 #define PPR_IGNORE_INK 0.001
 #define LOAD_WEIGHT_IGNORE 0.001
 
-#define DIS_THRESHOLD 10000 // range equals 10km
+#define DIS_THRESHOLD 100000 // range equals 10km
 //#define PRO_THRESHOLD 0.1   // the probability that falling within the range no less than 0.1
 
 #define MAXCLICK 257402

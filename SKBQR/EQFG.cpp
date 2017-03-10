@@ -843,6 +843,7 @@ void EQFG::rec_TQG_fromfile(string inPath, string outPath)
 						temptemp[tempResult[j].first] = result[tempResult[j].first] * tempResult[j].second;
 					}
 				}
+				result.clear();
 				result = temptemp;
 			}
 		}
