@@ -62,7 +62,7 @@ double EQFG::getSpatialSim(int qid) // the user's location is stored in a global
 			}
 		}
 	}
-	cerr << "spatial sim is: " << ret << endl;
+	//cerr << "spatial sim is: " << ret << endl;
 	return ret;
 }
 double EQFG::getSpatialSim_p(int qid) // use the partition to compute
@@ -75,7 +75,7 @@ double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 			ret += i->second;
 		}
 	}
-	cerr << "spatial sim is: " << ret << endl;
+	//cerr << "spatial sim is: " << ret << endl;
 	return ret;
 }
 
@@ -415,10 +415,10 @@ vector<pair<int, double>> EQFG::PPR_BCA_lazy_cache(vector<EQFG_Node> & nodes, ma
 		ret.push_back(reverseRet[reverseRet.size() - 1 - i]);
 	}
 	t4 = clock();
-	if (edgeType == 1) {
-		cerr << "                     EQFG takes:\t" << (t4 - t3 + 0.0) / CLOCKS_PER_SEC << " seconds" << endl;
-		cerr << "sptaial adjusting weights takes:\t" << timeforsptaial << " seconds" << endl;
-	}
+	//if (edgeType == 1) {
+	//	cerr << "                     EQFG takes:\t" << (t4 - t3 + 0.0) / CLOCKS_PER_SEC << " seconds" << endl;
+	//	cerr << "sptaial adjusting weights takes:\t" << timeforsptaial << " seconds" << endl;
+	//}
 
 
 	return ret;
