@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 			EQFG eqfg(argv[3]);
 			eqfg.loadTerm(argv[3]);
 			eqfg.loadLocation(argv[4]);
-			eqfg.rec_TQG_fromfile(argv[8], argv[9], atoi(argv[5]), atoi(argv[6]), atoi(argv[7]));
+			eqfg.rec_TQG_fromfile(argv[8], argv[9], atof(argv[5]), atof(argv[6]), atof(argv[7]));
 		}
 		else if (argv[2][1] == 'D') {
 		
