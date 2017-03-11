@@ -7,7 +7,7 @@
 
 using namespace std;
 
-string qlPath, testPath, locDir, outPath;
+/*string qlPath, testPath, locDir, outPath;
 
 void loadInputPaths(string pathPath, char** argv)
 {
@@ -28,6 +28,7 @@ void loadInputPaths(string pathPath, char** argv)
 	}
 	
 }
+*/
 
 void printUsage(char * argv[])
 {
@@ -43,7 +44,7 @@ int main(int argc, char** argv)
 			EQFG eqfg(argv[3]);
 			eqfg.loadTerm(argv[3]);
 			eqfg.loadLocation(argv[4]);
-			eqfg.rec_TQG_fromfile(testPath, outPath, atoi(argv[5]), atoi(argv[6]), atoi(argv[7]));
+			eqfg.rec_TQG_fromfile(argv[8], argv[9], atoi(argv[5]), atoi(argv[6]), atoi(argv[7]));
 		}
 		else if (argv[2][1] == 'D') {
 		
