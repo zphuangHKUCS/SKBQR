@@ -319,10 +319,10 @@ vector<pair<int, double>> EQFG::PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int,
 		ret.push_back(reverseRet[reverseRet.size() - 1 - i]);
 	}
 	t4 = clock();
-	if (edgeType == 1) {
-		cerr << "                      PPR takes:\t" << (t4 - t3 + 0.0) / CLOCKS_PER_SEC << " seconds" << endl;
-		cerr << "sptaial adjusting weights takes:\t" << timeforsptaial << " seconds" << endl;
-	}
+	//if (edgeType == 1) {
+		//cerr << "                      PPR takes:\t" << (t4 - t3 + 0.0) / CLOCKS_PER_SEC << " seconds" << endl;
+		//cerr << "sptaial adjusting weights takes:\t" << timeforsptaial << " seconds" << endl;
+	//}
 	
 
 	return ret;
@@ -782,7 +782,7 @@ void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
 	ofstream out(outPath.c_str(), ios::out);
 	string line;
 	while (getline(in, line)) {
-		cerr << line << endl;
+		//cerr << line << endl;
 		vector<string> strs = split(line);
 		string query = strs[1];
 		if (query2id_.find(query) != query2id_.end()) {
@@ -817,20 +817,20 @@ void EQFG::rec_TQG_fromfile(string inPath, string outPath, double alpha, double 
 	ofstream out(outPath.c_str(), ios::out);
 	string line;
 	while (getline(in, line)) {
-		cerr << line << endl;
+		//cerr << line << endl;
 		vector<string> strs = split(line);
 		string query = strs[1];
 		vector<string> terms = split(query, " ");
 		map <int, double> result;
 		bool firstTime = true;
 		for (int i = 0; i < terms.size(); ++i) {
-			cerr << terms[i] << endl;
+			//cerr << terms[i] << endl;
 			if (term2id_.find(terms[i]) == term2id_.end()) {
 				continue;
 			}
 			int tid = term2id_[terms[i]];
 			vector<pair<int, double>> tempResult = rec_TQG(tid, alpha, beta);
-			cerr << "Finish rec_TQG for " << terms[i] << endl;
+			//cerr << "Finish rec_TQG for " << terms[i] << endl;
 			if (firstTime) {
 				firstTime = false;
 				for (int j = 0; j < tempResult.size(); ++j) {
@@ -998,7 +998,7 @@ void DQG::rec_DQG_fromfile(string inPath, string outPath)
 	ofstream out(outPath.c_str(), ios::out);
 	string line;
 	while (getline(in, line)) {
-		cerr << line << endl;
+		//cerr << line << endl;
 		vector<string> strs = split(line);
 		string que = strs[1];
 		if (query2id_.find(que) != query2id_.end()) {
