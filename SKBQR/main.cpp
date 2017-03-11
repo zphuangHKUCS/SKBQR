@@ -29,11 +29,33 @@ void loadInputPaths(string pathPath, char** argv)
 	
 }
 
+void printUsage(char * argv[])
+{
+	cerr << "Usage:" << endl;
+	cerr << argv[0] << " -r -T queryLogDir locationDir alpha beta dist input output " << "\t for TQG recommendation" <<endl;
+	cerr << argv[0] << " -r -D queryLogDir locationDir alpha beta input output " << "\t for DQG recommendation" << endl;
+}
 
 int main(int argc, char** argv)
 {
+	if (argv[1][1] == 'r') {
+		if (argv[2][1] == 'T') {
+			EQFG eqfg(argv[3]);
+			eqfg.loadTerm(argv[3]);
+			eqfg.loadLocation(argv[4]);
+			eqfg.rec_TQG_fromfile(testPath, outPath, atoi(argv[5]), atoi(argv[6]), atoi(argv[7]));
+		}
+		else if (argv[2][1] == 'D') {
+		
+		}
+	}
+	else if(argv[1][1] == 'h'){
+		printUsage(argv);
+		return 0;
+	}
+	return 0;
 
-	loadInputPaths("paths.txt", argv);
+	//loadInputPaths("paths.txt", argv);
 
 	/*    // EQFG
 	EQFG eqfg(qlPath);
@@ -49,9 +71,6 @@ int main(int argc, char** argv)
 	*/
 	
 	     // TQG
-	EQFG eqfg(qlPath);
-	eqfg.loadTerm(qlPath);
-	eqfg.loadLocation(locDir);
-	eqfg.rec_TQG_fromfile(testPath, outPath);
+	
 	return 0;
 }

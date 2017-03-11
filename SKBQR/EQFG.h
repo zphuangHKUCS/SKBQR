@@ -29,7 +29,6 @@ using namespace std;
 #define PPR_IGNORE_INK 0.001
 #define LOAD_WEIGHT_IGNORE 0.001
 
-#define DIS_THRESHOLD 100000 // range equals 10km
 //#define PRO_THRESHOLD 0.1   // the probability that falling within the range no less than 0.1
 
 #define MAXCLICK 257402
@@ -74,7 +73,7 @@ private:
 	float Ulat, Ulon;
 	//int UlocID = 5378;  // boston
 	int UlocID; // new york
-
+	double r_;
 	
 
 	vector<pair<int, double>> PPR_BCA(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType = 0);
@@ -88,7 +87,7 @@ public:
 	int k_;
 	vector<pair<int, double> > rec_QFG(int qid);
 	vector<pair<int, double> > rec_EQFG(int qid);
-	vector<pair<int, double> > rec_TQG(int tid);
+	vector<pair<int, double> > rec_TQG(int tid, double alpha, double beta);
 
 
 public:
@@ -126,7 +125,7 @@ public:
 
 	void rec_QFG_fromfile(string inputPath, string outPath);
 	void rec_EQFG_fromfile(string inputPath, string outPath);
-	void rec_TQG_fromfile(string inputPath, string outPath);
+	void rec_TQG_fromfile(string inputPath, string outPath, double alpha, double beta, double r);
 
 	void loadLocation(const string locDir);
 	void loadTerm(const string queryDir);

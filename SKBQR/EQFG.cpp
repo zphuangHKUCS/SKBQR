@@ -47,7 +47,7 @@ double getDistance_app(double lat1, double lon1, double lat2, double lon2)
 	dis += (lat1 - lat2) * (lat1 - lat2);
 	dis += (lon2 - lon1) * (lon2 - lon1);
 	dis = sqrt(dis);
-	dis *= 1000;
+	dis *= 111.31955 * 1000;
 	return dis;
 }
 double EQFG::getSpatialSim(int qid) // the user's location is stored in a global varible Ulat, Ulon
@@ -57,7 +57,7 @@ double EQFG::getSpatialSim(int qid) // the user's location is stored in a global
 		map<int, float> & locMap = iter->second;
 		//cerr << locMap.size() << endl;
 		for (map<int, float>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
-			if (getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second) <= DIS_THRESHOLD) {
+			if (getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second) <= r_) {
 				ret += i->second;
 			}
 		}
@@ -71,7 +71,7 @@ double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 	map<int, float> & locMap = QNodes_[qid].p2loc_[this->loc2partition_[UlocID]];
 	//cerr << locMap.size() << endl;
 	for (map<int, float>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
-		if (getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second) <= DIS_THRESHOLD) {
+		if (getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second) <= r_) {
 			ret += i->second;
 		}
 	}
@@ -734,7 +734,7 @@ vector<pair<int, double> > EQFG::rec_EQFG(int qid)
 	return PPR_BCA_lazy_cache(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, k_, 1);
 }
 
-vector<pair<int, double> > EQFG::rec_TQG(int tid)
+vector<pair<int, double> > EQFG::rec_TQG(int tid, double alpha, double beta)
 {
 	Ulat = loc2cor_[UlocID].first;
 	Ulon = loc2cor_[UlocID].second;
@@ -742,7 +742,7 @@ vector<pair<int, double> > EQFG::rec_TQG(int tid)
 	for (int i = 0; i < TNodes_[tid].toQueryEdges_.size(); ++i) {
 		qink[TNodes_[tid].toQueryEdges_[i].eid_] = TNodes_[tid].toQueryEdges_[i].w_;
 	}
-	return PPR_BCA_lazy_cache(QNodes_, qink, EQFG_PPR_QUERY_ALPHA, 0.5, 10 * k_, 1); // return more than k, so we can choose
+	return PPR_BCA_lazy_cache(QNodes_, qink, alpha, beta, 10 * k_, 1); // return more than k, so we can choose
 }
 
 void EQFG::rec_QFG_fromfile(string inPath, string outPath)
@@ -807,9 +807,10 @@ void EQFG::rec_EQFG_fromfile(string inPath, string outPath)
 	cerr << "EQFG recommendation takes " << (t2 - t1 + 0.0) / CLOCKS_PER_SEC << "seconds" << endl;
 }
 
-void EQFG::rec_TQG_fromfile(string inPath, string outPath)
+void EQFG::rec_TQG_fromfile(string inPath, string outPath, double alpha, double beta, double r)
 {
 	UlocID = loc2id_["New york"];
+	r_ = r;
 	cerr << "Start running TQG reccommendation." << endl;
 	clock_t t1 = clock();
 	ifstream in(inPath.c_str(), ios::in);
@@ -828,7 +829,7 @@ void EQFG::rec_TQG_fromfile(string inPath, string outPath)
 				continue;
 			}
 			int tid = term2id_[terms[i]];
-			vector<pair<int, double>> tempResult = rec_TQG(tid);
+			vector<pair<int, double>> tempResult = rec_TQG(tid, alpha, beta);
 			cerr << "Finish rec_TQG for " << terms[i] << endl;
 			if (firstTime) {
 				firstTime = false;
@@ -990,7 +991,7 @@ void DQG::rec_DQG_fromfile(string inPath, string outPath)
 {
 	//40.7128° N, 74.0059° W new york
 	Ulat = 40.7128;
-	Ulon = 74.0059;
+	Ulon = -74.0059;
 	cerr << "Start running DQG reccommendation." << endl;
 	clock_t t1 = clock();
 	ifstream in(inPath.c_str(), ios::in);
