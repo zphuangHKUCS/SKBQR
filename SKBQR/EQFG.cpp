@@ -62,7 +62,7 @@ double EQFG::getSpatialSim(int qid) // the user's location is stored in a global
 			}
 		}
 	}
-	cerr << "spatial sim is: " << ret << endl;
+	//cerr << "spatial sim is: " << ret << endl;
 	return ret;
 }
 double EQFG::getSpatialSim_p(int qid) // use the partition to compute
@@ -437,7 +437,11 @@ void EQFG::loadLocation(const string locPath)
 		}
 		// remove the query2loc temparorily
 		//query2loc_[qid] = tempMap;
-		
+		cerr << qid;
+		for (map<pair<int, int>, double>::iterator i = QNodes_[qid].p2sims_.begin(); i != QNodes_[qid].p2sims_.end(); ++i) {
+			cerr << '\t' << i->first.first << '\t' << i->first.second << '\t' << i->second;
+		}
+		cerr << endl;
 	}
 	query2locIn.close();
 	cerr << "#location:" << '\t' << locations_.size() << endl;
