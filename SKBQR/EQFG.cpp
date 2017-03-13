@@ -100,7 +100,7 @@ double EQFG::spatialAdjustWeight(int qid, double w, double beta, vector<double> 
 			double sptialSim = getSpatialSim_p(qid);
 			spCache[qid] = sptialSim;
 		}
-		cerr << spCache[qid] << endl;
+		//cerr << spCache[qid] << endl;
 		return beta * w + (1 - beta) * spCache[qid];
 	}
 }
@@ -432,11 +432,13 @@ void EQFG::loadLocation(const string locPath)
 			if (QNodes_[qid].p2loc_.find(p) == QNodes_[qid].p2loc_.end()) {
 				QNodes_[qid].p2loc_[p] = map<int, float>();
 			}
+			/*
 			QNodes_[qid].p2loc_[p][i->first] = i->second;
 			if (QNodes_[qid].p2sims_.find(p) == QNodes_[qid].p2sims_.end()) {
 				QNodes_[qid].p2sims_[p] = 0.0;
 			}
 			QNodes_[qid].p2sims_[p] += i->second;
+			*/
 		}
 		// remove the query2loc temparorily
 		//query2loc_[qid] = tempMap;
