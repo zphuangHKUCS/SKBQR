@@ -68,10 +68,10 @@ double EQFG::getSpatialSim(int qid) // the user's location is stored in a global
 double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 {
 	if (QNodes_[qid].p2sims_.find(loc2partition_[UlocID]) == QNodes_[qid].p2sims_.end()) {
-		//cerr << 0.0 << endl;
+		cerr << 0.0 << endl;
 		return 0.0;
 	}
-	//cerr << QNodes_[qid].p2sims_[loc2partition_[UlocID]] << endl;
+	cerr << QNodes_[qid].p2sims_[loc2partition_[UlocID]] << endl;
 	return QNodes_[qid].p2sims_[loc2partition_[UlocID]];
 
 	////////////
@@ -91,16 +91,16 @@ double EQFG::spatialAdjustWeight(int qid, double w, double beta, vector<double> 
 {
 	//return beta * w + (1 - beta) * getSpatialSim(qid);
 	if (spCache.size() == 0) {
-		return beta * w + (1 - beta) * getSpatialSim(qid);
-		//return beta * w + (1 - beta) * getSpatialSim_p(qid);
+		//return beta * w + (1 - beta) * getSpatialSim(qid);
+		return beta * w + (1 - beta) * getSpatialSim_p(qid);
 	}
 	else {
 		if (spCache[qid] < 0) {
-			double sptialSim = getSpatialSim(qid);
-			//double sptialSim = getSpatialSim_p(qid);
+			//double sptialSim = getSpatialSim(qid);
+			double sptialSim = getSpatialSim_p(qid);
 			spCache[qid] = sptialSim;
 		}
-		//cerr << spCache[qid] << endl;
+		cerr << spCache[qid] << endl;
 		return beta * w + (1 - beta) * spCache[qid];
 	}
 }
@@ -396,15 +396,18 @@ void EQFG::loadLocation(const string locPath)
 	ifstream indexIn(indexPath.c_str());
 	while (getline(indexIn, line)) {
 		vector<string> strs = split(line);
-		int locID = loc2id_[strs[2]];
+		
 		int x = atoi(strs[0].c_str());
 		int y = atoi(strs[1].c_str());
 		pair<int, int> p = make_pair(x, y);
+		for (int i = 2; i < strs.size(); ++i) {
+			int locID = loc2id_[strs[i]];
+			loc2partition_[locID] = p;
+		}
 		//if (partition_.find(p) == partition_.end()) {
 		//	partition_[p] = vector<int>();
 		//}
 		//partition_[p].push_back(locID);
-		loc2partition_[locID] = p;
 	}
 	indexIn.close();
 
@@ -437,11 +440,11 @@ void EQFG::loadLocation(const string locPath)
 		}
 		// remove the query2loc temparorily
 		//query2loc_[qid] = tempMap;
-		cerr << qid;
-		for (map<pair<int, int>, double>::iterator i = QNodes_[qid].p2sims_.begin(); i != QNodes_[qid].p2sims_.end(); ++i) {
-			cerr << '\t' << i->first.first << '\t' << i->first.second << '\t' << i->second;
-		}
-		cerr << endl;
+		//cerr << qid;
+		//for (map<pair<int, int>, double>::iterator i = QNodes_[qid].p2sims_.begin(); i != QNodes_[qid].p2sims_.end(); ++i) {
+		//	cerr << '\t' << i->first.first << '\t' << i->first.second << '\t' << i->second;
+		//}
+		//cerr << endl;
 	}
 	query2locIn.close();
 	cerr << "#location:" << '\t' << locations_.size() << endl;
