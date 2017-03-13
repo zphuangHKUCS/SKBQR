@@ -694,8 +694,8 @@ vector<pair<int, double> > EQFG::rec_TQG(int tid, double alpha, double beta)
 		qink[TNodes_[tid].toQueryEdges_[i].eid_] = TNodes_[tid].toQueryEdges_[i].w_;
 	}
 	//return PPR_BCA(QNodes_, qink, alpha, beta, 10 * k_, 1); // return more than k, so we can choose
-	return PPR_BCA_lazy(QNodes_, qink, alpha, beta, 10 * k_, 1); // return more than k, so we can choose
-	//return PPR_BCA_lazy_cache(QNodes_, qink, alpha, beta, 10 * k_, 1); // return more than k, so we can choose
+	//return PPR_BCA_lazy(QNodes_, qink, alpha, beta, 10 * k_, 1); // return more than k, so we can choose
+	return PPR_BCA_lazy_cache(QNodes_, qink, alpha, beta, 10 * k_, 1); // return more than k, so we can choose
 }
 
 void EQFG::rec_QFG_fromfile(string inPath, string outPath)
