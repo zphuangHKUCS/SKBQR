@@ -171,65 +171,6 @@ vector<pair<int, double>> EQFG::PPR_BCA(vector<EQFG_Node> & nodes, map<int, doub
 		ret.push_back(reverseRet[reverseRet.size() - 1 - i]);
 	}
 	return ret;
-	/*
-	// edgeType = 0 for entity PPR
-	// edgeType = 1 for query PPR
-	BoundHeap heap(nodes.size());
-	double activeInk = 0.0;
-	map<int, double> result;
-
-	// initialize the heap
-	for (map<int, double>::iterator i = initialInk.begin(); i != initialInk.end(); ++i) {
-		heap.push(*i);
-		activeInk += i->second;
-	}
-
-	while (heap.size() > 0){ //&& activeInk > PPR_EPS) {
-		//cerr << heap.size() << endl;
-		pair<int, double> topItem = heap.pop();
-		if (topItem.second < PPR_IGNORE_INK) {
-			break;
-		}
-		double increaseInk = topItem.second * alpha;
-		if (result.find(topItem.first) == result.end()) {
-			result[topItem.first] = 0.0;
-		}
-		result[topItem.first] += increaseInk;
-		activeInk -= increaseInk;
-		double distributedInk = (1.0 - alpha) * topItem.second;
-		
-		// Bug checking
-		//if (topItem.first > nodes.size()) continue;
-
-		vector<EQFG_Edge> & edges = nodes[topItem.first].toEntityEdges_;
-		if (edgeType == 1) {
-			edges = nodes[topItem.first].toQueryEdges_;
-		}
-		for (int i = 0; i < edges.size(); ++i) {
-			double tw = edges[i].w_;
-			if (edgeType == 1) {
-				// Adjust the weights for query2query edges
-				tw = spatialAdjustWeight(edges[i].eid_, tw, beta);
-			}
-			double addInk = distributedInk * tw;
-			heap.push(make_pair(edges[i].eid_, addInk));
-		}
-	}
-	// find the result
-	BoundHeap topk(k);
-	for (map<int, double>::iterator i = result.begin(); i != result.end(); ++i) {
-		topk.push(make_pair(i->first, -i->second));
-	}
-	vector<pair<int, double> > reverseRet, ret;
-	while (topk.size() > 0) {
-		pair<int, double> item = topk.pop();
-		reverseRet.push_back(make_pair(item.first, -item.second));
-	}
-	for (int i = 0; i < reverseRet.size(); ++i) {
-		ret.push_back(reverseRet[reverseRet.size() - 1 - i]);
-	}
-	return ret;
-*/
 }
 
 vector<pair<int, double>> EQFG::PPR_BCA_lazy(vector<EQFG_Node> & nodes, map<int, double> & initialInk, double alpha, double beta, int k, int edgeType)
@@ -742,7 +683,9 @@ vector<pair<int, double> > EQFG::rec_TQG(int tid, double alpha, double beta)
 	for (int i = 0; i < TNodes_[tid].toQueryEdges_.size(); ++i) {
 		qink[TNodes_[tid].toQueryEdges_[i].eid_] = TNodes_[tid].toQueryEdges_[i].w_;
 	}
-	return PPR_BCA_lazy_cache(QNodes_, qink, alpha, beta, 10 * k_, 1); // return more than k, so we can choose
+	return PPR_BCA(QNodes_, qink, alpha, beta, 10 * k_, 1); // return more than k, so we can choose
+	//return PPR_BCA_lazy(QNodes_, qink, alpha, beta, 10 * k_, 1); // return more than k, so we can choose
+	//return PPR_BCA_lazy_cache(QNodes_, qink, alpha, beta, 10 * k_, 1); // return more than k, so we can choose
 }
 
 void EQFG::rec_QFG_fromfile(string inPath, string outPath)
