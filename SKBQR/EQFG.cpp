@@ -67,9 +67,15 @@ double EQFG::getSpatialSim(int qid) // the user's location is stored in a global
 }
 double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 {
+	if (QNodes_[qid].p2sims_.find(loc2partition_[UlocID]) == QNodes_[qid].p2sims_.end()) {
+		return 0.0;
+	}
+	return QNodes_[qid].p2sims_[loc2partition_[UlocID]];
+
+	////////////
 	double ret = 0.0;
 	map<int, float> & locMap = QNodes_[qid].p2loc_[this->loc2partition_[UlocID]];
-	//cerr << locMap.size() << endl;
+	
 	for (map<int, float>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
 		if (getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second) <= r_) {
 			ret += i->second;
@@ -83,13 +89,13 @@ double EQFG::spatialAdjustWeight(int qid, double w, double beta, vector<double> 
 {
 	//return beta * w + (1 - beta) * getSpatialSim(qid);
 	if (spCache.size() == 0) {
-		return beta * w + (1 - beta) * getSpatialSim(qid);
-		//return beta * w + (1 - beta) * getSpatialSim_p(qid);
+		//return beta * w + (1 - beta) * getSpatialSim(qid);
+		return beta * w + (1 - beta) * getSpatialSim_p(qid);
 	}
 	else {
 		if (spCache[qid] < 0) {
-			double sptialSim = getSpatialSim(qid);
-			//double sptialSim = getSpatialSim_p(qid);
+			//double sptialSim = getSpatialSim(qid);
+			double sptialSim = getSpatialSim_p(qid);
 			spCache[qid] = sptialSim;
 		}
 		//cerr << spCache[qid] << endl;
@@ -422,6 +428,10 @@ void EQFG::loadLocation(const string locPath)
 				QNodes_[qid].p2loc_[p] = map<int, float>();
 			}
 			QNodes_[qid].p2loc_[p][i->first] = i->second;
+			if (QNodes_[qid].p2sims_.find(p) == QNodes_[qid].p2sims_.end()) {
+				QNodes_[qid].p2sims_[p] = 0.0;
+			}
+			QNodes_[qid].p2sims_[p] += i->second;
 		}
 		// remove the query2loc temparorily
 		//query2loc_[qid] = tempMap;

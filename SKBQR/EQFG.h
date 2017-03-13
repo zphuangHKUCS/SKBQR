@@ -52,7 +52,8 @@ public:
     vector<EQFG_Edge> toEntityEdges_;
 	vector<EQFG_Edge> toDocEdges_;
 	map<pair<int, int>, map<int, float>> p2loc_;
-	
+	map<pair<int, int>, double> p2sims_;
+
 	EQFG_Node(int id);
 
 };
