@@ -68,10 +68,10 @@ double EQFG::getSpatialSim(int qid) // the user's location is stored in a global
 double EQFG::getSpatialSim_p(int qid) // use the partition to compute
 {
 	if (QNodes_[qid].p2sims_.find(loc2partition_[UlocID]) == QNodes_[qid].p2sims_.end()) {
-		cerr << 0.0 << endl;
+		//cerr << 0.0 << endl;
 		return 0.0;
 	}
-	cerr << QNodes_[qid].p2sims_[loc2partition_[UlocID]] << endl;
+	//cerr << QNodes_[qid].p2sims_[loc2partition_[UlocID]] << endl;
 	return QNodes_[qid].p2sims_[loc2partition_[UlocID]];
 
 	////////////
