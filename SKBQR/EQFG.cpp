@@ -429,16 +429,18 @@ void EQFG::loadLocation(const string locPath)
 			i->second /= sum;
 			enum_q2l += 1;
 			pair<int, int> p = loc2partition_[i->first];
+			/*
 			if (QNodes_[qid].p2loc_.find(p) == QNodes_[qid].p2loc_.end()) {
 				QNodes_[qid].p2loc_[p] = map<int, float>();
 			}
-			/*
 			QNodes_[qid].p2loc_[p][i->first] = i->second;
+			*/
+
 			if (QNodes_[qid].p2sims_.find(p) == QNodes_[qid].p2sims_.end()) {
 				QNodes_[qid].p2sims_[p] = 0.0;
 			}
 			QNodes_[qid].p2sims_[p] += i->second;
-			*/
+			
 		}
 		// remove the query2loc temparorily
 		//query2loc_[qid] = tempMap;
