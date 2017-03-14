@@ -426,6 +426,8 @@ void EQFG::loadLocation(const string locPath)
 		}
 		for (map<int, float>::iterator i = tempMap.begin(); i != tempMap.end(); ++i) {
 			i->second /= sum;
+			if (i->second < 0.01)
+				continue;
 			enum_q2l += 1;
 			pair<int, int> p = loc2partition_[i->first];
 			
