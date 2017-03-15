@@ -654,6 +654,8 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 
 vector<pair<int, double> > EQFG::rec_QFG(int qid, double alpha, double beta)
 {
+	Ulat = loc2cor_[UlocID].first;
+	Ulon = loc2cor_[UlocID].second;
 	map<int, double> ink;
 	ink[qid] = 1.0;
 	return PPR_BCA_lazy_cache(QNodes_, ink, alpha, beta, k_, 1);
