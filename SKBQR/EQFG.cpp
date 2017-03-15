@@ -50,6 +50,81 @@ double getDistance_app(double lat1, double lon1, double lat2, double lon2)
 	dis *= 111.31955 * 1000;
 	return dis;
 }
+
+double EQFG::getSpatialSim_MinD(int qid) // the user's location is stored in a global varible Ulat, Ulon
+{
+	double ret = 16200000000;
+	for (map<pair<int, int>, map<int, float>>::iterator iter = QNodes_[qid].p2loc_.begin(); iter != QNodes_[qid].p2loc_.end(); ++iter) {
+		map<int, float> & locMap = iter->second;
+		//cerr << locMap.size() << endl;
+		for (map<int, float>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
+			double d = getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second);
+			if (d < ret) {
+				ret = d;
+			}
+		}
+	}
+	ret /= 16200000000; // nomalized to 0 - 1
+	return 1.0 - ret;
+}
+
+double EQFG::getSpatialSim_MaxD(int qid) // the user's location is stored in a global varible Ulat, Ulon
+{
+	double ret = 0.0;
+	for (map<pair<int, int>, map<int, float>>::iterator iter = QNodes_[qid].p2loc_.begin(); iter != QNodes_[qid].p2loc_.end(); ++iter) {
+		map<int, float> & locMap = iter->second;
+		//cerr << locMap.size() << endl;
+		for (map<int, float>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
+			double d = getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second);
+			if (d > ret) {
+				ret = d;
+			}
+		}
+	}
+	ret /= 16200000000; // nomalized to 0 - 1
+	if (ret >= 1.0) {
+		ret = 1.0;
+	}
+	return 1.0 - ret;
+}
+
+double EQFG::getSpatialSim_MeanD(int qid) // the user's location is stored in a global varible Ulat, Ulon
+{
+	double ret = 0.0;
+	double lat = 0.0, lon = 0.0;
+	for (map<pair<int, int>, map<int, float>>::iterator iter = QNodes_[qid].p2loc_.begin(); iter != QNodes_[qid].p2loc_.end(); ++iter) {
+		map<int, float> & locMap = iter->second;
+		//cerr << locMap.size() << endl;
+		for (map<int, float>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
+			lat += i->second * loc2cor_[i->first].first;
+			lon += i->second * loc2cor_[i->first].second;
+		}
+	}
+	ret = getDistance(Ulat, Ulon, lat, lon);
+	ret /= 16200000000; // nomalized to 0 - 1
+	if (ret >= 1.0) {
+		ret = 1.0;
+	}
+	return 1.0 - ret;
+}
+
+double EQFG::getSpatialSim_ED(int qid) // the user's location is stored in a global varible Ulat, Ulon
+{
+	double ret = 0.0;
+	for (map<pair<int, int>, map<int, float>>::iterator iter = QNodes_[qid].p2loc_.begin(); iter != QNodes_[qid].p2loc_.end(); ++iter) {
+		map<int, float> & locMap = iter->second;
+		//cerr << locMap.size() << endl;
+		for (map<int, float>::iterator i = locMap.begin(); i != locMap.end(); ++i) {
+			ret += i->second * getDistance(Ulat, Ulon, loc2cor_[i->first].first, loc2cor_[i->first].second);
+		}
+	}
+	ret /= 16200000000; // nomalized to 0 - 1
+	if (ret >= 1.0) {
+		ret = 1.0;
+	}
+	return 1.0 - ret;
+}
+
 double EQFG::getSpatialSim(int qid) // the user's location is stored in a global varible Ulat, Ulon
 {
 	double ret = 0.0;
@@ -95,7 +170,11 @@ double EQFG::spatialAdjustWeight(int qid, double w, double beta, vector<double> 
 	}
 	else {
 		if (spCache[qid] < 0) {
-			double sptialSim = getSpatialSim(qid);
+			//double sptialSim = getSpatialSim(qid);
+			//double sptialSim = getSpatialSim(qid);
+			//double sptialSim = getSpatialSim(qid);
+			//double sptialSim = getSpatialSim(qid);
+			double sptialSim = getSpatialSim_ED(qid);
 			//double sptialSim = getSpatialSim_p(qid);
 			spCache[qid] = sptialSim;
 		}

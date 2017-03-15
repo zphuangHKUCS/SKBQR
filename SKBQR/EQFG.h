@@ -83,6 +83,10 @@ private:
 	double spatialAdjustWeight(int qid, double w, double beta, vector<double> & spCache);
 	double getSpatialSim(int qid);
 	double getSpatialSim_p(int qid);
+	double getSpatialSim_ED(int qid);
+	double getSpatialSim_MinD(int qid);
+	double getSpatialSim_MaxD(int qid);
+	double getSpatialSim_MeanD(int qid);
 
 public:
 	int k_;
