@@ -729,6 +729,9 @@ void EQFG::rec_QFG_fromfile(string inPath, string outPath, double alpha, double 
 			vector<pair<int, double> > ret = rec_QFG(qid, alpha, beta);
 			out << query;
 			for (int i = 0; i < ret.size(); ++i) {
+				if (queries_[ret[i].first] == query) {
+					continue;
+				}
 				out << '\t' << queries_[ret[i].first] << '\t' << ret[i].second;
 			}
 			out << endl;
