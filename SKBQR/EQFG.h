@@ -86,7 +86,7 @@ private:
 
 public:
 	int k_;
-	vector<pair<int, double> > rec_QFG(int qid);
+	vector<pair<int, double> > rec_QFG(int qid, double alpha, double beta);
 	vector<pair<int, double> > rec_EQFG(int qid);
 	vector<pair<int, double> > rec_TQG(int tid, double alpha, double beta);
 
@@ -124,7 +124,7 @@ public:
  
     void saveToFiles(string dirPath);
 
-	void rec_QFG_fromfile(string inputPath, string outPath);
+	void rec_QFG_fromfile(string inputPath, string outPath, double alpha, double beta, double r);
 	void rec_EQFG_fromfile(string inputPath, string outPath);
 	void rec_TQG_fromfile(string inputPath, string outPath, double alpha, double beta, double r);
 

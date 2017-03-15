@@ -35,6 +35,7 @@ void printUsage(char * argv[])
 	cerr << "Usage:" << endl;
 	cerr << argv[0] << " -r -T queryLogDir locationDir alpha beta dist input output " << "\t for TQG recommendation" <<endl;
 	cerr << argv[0] << " -r -D queryLogDir locationDir alpha beta input output " << "\t for DQG recommendation" << endl;
+	cerr << argv[0] << " -r -Q queryLogDir locationDir alpha beta input output " << "\t for QFG recommendation" << endl;
 }
 
 int main(int argc, char** argv)
@@ -48,6 +49,11 @@ int main(int argc, char** argv)
 		}
 		else if (argv[2][1] == 'D') {
 		
+		}
+		else if(argv[2][1] == 'Q') {
+			EQFG eqfg(argv[3]);
+			eqfg.loadLocation(argv[4]);
+			eqfg.rec_QFG_fromfile(argv[8], argv[9], atof(argv[5]), atof(argv[6]), atof(argv[7]));
 		}
 	}
 	else if(argv[1][1] == 'h'){

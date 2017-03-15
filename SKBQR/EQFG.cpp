@@ -652,11 +652,11 @@ EQFG::EQFG(string indexPAth, int k): k_(k)
 	cerr << "#query:" << '\t' << queries_.size() << endl;
 }
 
-vector<pair<int, double> > EQFG::rec_QFG(int qid)
+vector<pair<int, double> > EQFG::rec_QFG(int qid, double alpha, double beta)
 {
 	map<int, double> ink;
 	ink[qid] = 1.0;
-	return PPR_BCA(QNodes_, ink, EQFG_PPR_QUERY_ALPHA, 1.0, k_, 1);
+	return PPR_BCA_lazy_cache(QNodes_, ink, alpha, beta, k_, 1);
 }
 
 vector<pair<int, double> > EQFG::rec_EQFG(int qid)
@@ -712,8 +712,10 @@ vector<pair<int, double> > EQFG::rec_TQG(int tid, double alpha, double beta)
 	return PPR_BCA_lazy_cache(QNodes_, qink, alpha, beta, 10 * k_, 1); // return more than k, so we can choose
 }
 
-void EQFG::rec_QFG_fromfile(string inPath, string outPath)
+void EQFG::rec_QFG_fromfile(string inPath, string outPath, double alpha, double beta, double r)
 {
+	UlocID = loc2id_["New york"];
+	r_ = r;
 	cerr << "Start running QFG reccommendation." << endl;
 	clock_t t1 = clock();
 	ifstream in(inPath.c_str(), ios::in);
@@ -723,7 +725,7 @@ void EQFG::rec_QFG_fromfile(string inPath, string outPath)
 		//cerr << line << endl;
 		if (query2id_.find(line) != query2id_.end()) {
 			int qid = query2id_[line];
-			vector<pair<int, double> > ret = rec_QFG(qid);
+			vector<pair<int, double> > ret = rec_QFG(qid, alpha, beta);
 			out << line;
 			for (int i = 0; i < ret.size(); ++i) {
 				out << '\t' << queries_[ret[i].first] << '\t' << ret[i].second;
