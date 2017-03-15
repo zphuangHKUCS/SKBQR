@@ -723,17 +723,18 @@ void EQFG::rec_QFG_fromfile(string inPath, string outPath, double alpha, double 
 	string line;
 	while (getline(in, line)) {
 		//cerr << line << endl;
-		if (query2id_.find(line) != query2id_.end()) {
-			int qid = query2id_[line];
+		string query = split(line)[1];
+		if (query2id_.find(query) != query2id_.end()) {
+			int qid = query2id_[query];
 			vector<pair<int, double> > ret = rec_QFG(qid, alpha, beta);
-			out << line;
+			out << query;
 			for (int i = 0; i < ret.size(); ++i) {
 				out << '\t' << queries_[ret[i].first] << '\t' << ret[i].second;
 			}
 			out << endl;
 		}
 		else {
-			out << line << endl;
+			out << query << endl;
 		}
 	}
 	in.close();
