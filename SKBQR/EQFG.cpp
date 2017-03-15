@@ -171,8 +171,8 @@ double EQFG::spatialAdjustWeight(int qid, double w, double beta, vector<double> 
 	else {
 		if (spCache[qid] < 0) {
 			//double sptialSim = getSpatialSim(qid);
-			//double sptialSim = getSpatialSim(qid);
-			double sptialSim = getSpatialSim_MaxD(qid);
+			double sptialSim = getSpatialSim_MeanD(qid);
+			//double sptialSim = getSpatialSim_MaxD(qid);
 			//double sptialSim = getSpatialSim_MinD(qid);
 			//double sptialSim = getSpatialSim_ED(qid);
 			//double sptialSim = getSpatialSim_p(qid);
